@@ -1,0 +1,49 @@
+/* WriteFlow Design Tokens — Light Theme (Default)
+   Nguồn sự thật: docs/PLAN.md Phụ lục C.1
+   Quy tắc: Cấm hard-code màu sắc trong component/CSS
+*/
+:root {
+  /* Nền & bề mặt */
+  --editor-bg-main: #ffffff;
+  --editor-bg-paper: #ffffff;
+  --editor-bg-toolbar: #f8fafc;
+  --editor-bg-hover: #f1f5f9;
+  --editor-bg-active: #e2e8f0;
+  --editor-bg-code: #f1f5f9;
+  --editor-bg-selection: #c7d2fe;
+
+  /* Chữ */
+  --editor-text-primary: #0f172a;
+  --editor-text-secondary: #475569;
+  --editor-text-muted: #94a3b8;
+  --editor-text-accent: #2563eb;
+  --editor-text-code: #0f172a;
+
+  /* Trạng thái */
+  --editor-text-error: #b91c1c;
+  --editor-text-warning: #b45309;
+  --editor-text-success: #15803d;
+
+  /* Viền, bo góc */
+  --editor-border-color: #e2e8f0;
+  --editor-border-focus: #3b82f6;
+  --editor-radius-sm: 4px;
+  --editor-radius-md: 8px;
+  --editor-radius-lg: 12px;
+
+  /* Font & cỡ chữ (hỗ trợ đầy đủ dấu tiếng Việt) */
+  --editor-font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --editor-font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+  --editor-font-size: 16px;
+  --editor-line-height: 1.6; /* tối thiểu 1.5 để không cắt dấu chồng */
+
+  /* Tờ giấy */
+  --editor-max-width: 800px;
+  --editor-padding-horizontal: 32px;
+  --editor-padding-vertical: 40px;
+
+  /* Đổ bóng */
+  --editor-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --editor-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --editor-shadow-bubble: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}

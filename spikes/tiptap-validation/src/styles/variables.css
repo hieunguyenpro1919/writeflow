@@ -1,0 +1,46 @@
+/* WriteFlow Design Tokens (PLAN.md Phụ lục C) */
+:root {
+  /* Nền & bề mặt */
+  --editor-bg-main: #f8fafc;
+  --editor-bg-paper: #ffffff;
+  --editor-bg-toolbar: #f1f5f9;
+  --editor-bg-hover: #e2e8f0;
+  --editor-bg-active: #cbd5e1;
+  --editor-bg-code: #f1f5f9;
+  --editor-bg-selection: #c7d2fe;
+
+  /* Chữ */
+  --editor-text-primary: #0f172a;
+  --editor-text-secondary: #475569;
+  --editor-text-muted: #94a3b8;
+  --editor-text-accent: #2563eb;
+  --editor-text-code: #0f172a;
+
+  /* Trạng thái */
+  --editor-text-error: #b91c1c;
+  --editor-bg-error: #fef2f2;
+  --editor-border-error: #fecaca;
+  --editor-text-warning: #b45309;
+  --editor-bg-warning: #fffbeb;
+  --editor-border-warning: #fde68a;
+  --editor-text-success: #15803d;
+  --editor-bg-success: #f0fdf4;
+  --editor-border-success: #bbf7d0;
+
+  /* Viền, bo góc */
+  --editor-border-color: #e2e8f0;
+  --editor-border-focus: #3b82f6;
+  --editor-radius-sm: 4px;
+  --editor-radius-md: 8px;
+  --editor-radius-lg: 12px;
+
+  /* Font & cỡ chữ */
+  --editor-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --editor-font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  --editor-font-size: 16px;
+  --editor-line-height: 1.6;
+
+  /* Đổ bóng */
+  --editor-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --editor-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "WriteFlow",
+    "tagline": "Trình soạn thảo Markdown WYSIWYG",
+    "placeholder": "Bắt đầu viết tài liệu của bạn tại đây..."
+  },
+  "status": {
+    "ready": "Sẵn sàng",
+    "words": "{{count}} từ",
+    "chars": "{{count}} ký tự"
+  },
+  "phase0": {
+    "welcomeTitle": "Chào mừng đến với WriteFlow",
+    "welcomeSubtitle": "Giai đoạn Phase 0 — Bootstrap Project đã được thiết lập thành công."
+  }
+}

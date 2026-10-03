@@ -3,7 +3,7 @@ title: "PLAN V1.1 — FINAL"
 subtitle: "Trình soạn thảo tài liệu Markdown WYSIWYG mã nguồn mở"
 ---
 
-**Trạng thái:** PLAN — chưa Build. Đây là bản hợp nhất cuối cùng, thay thế cả tài liệu của Gemini lẫn Plan V1.0.
+**Trạng thái:** PLAN — Đã duyệt và bắt đầu Build. Đây là bản hợp nhất cuối cùng, thay thế cả tài liệu của Gemini lẫn Plan V1.0.
 
 **Nguồn hợp nhất:** Kế hoạch của Gemini (chi tiết kỹ thuật) + Plan V1.0 của ChatGPT (triết lý, phạm vi, quy trình) + đánh giá của Claude (các lỗ hổng cần vá).
 
