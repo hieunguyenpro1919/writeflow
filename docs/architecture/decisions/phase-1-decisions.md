@@ -19,5 +19,5 @@
 ---
 
 ### Ghi chú bổ sung cuối Phase 1:
-- **Quyết định tinh gọn Task 1.14 (E2E Playwright):** Theo chỉ đạo của PO trong Task Card Nhóm E, dự án tạm hoãn triển khai Playwright E2E tự động tại Phase 1 để giữ nhịp độ tinh gọn; toàn bộ 9 kịch bản tương tác bàn phím và bộ gõ tiếng Việt được chuyển sang thực hiện thủ công có hướng dẫn tại `docs/qa/phase-1-manual.md`, kết hợp cùng 174 test tự động (unit/component/guards) đạt 100% tỷ lệ vượt qua.
+- **Xác nhận Playwright E2E (Task 1.14 / P1-D3):** Quyết định P1-D3 được giữ lại và hoàn thành trọn vẹn ở Phase 1. Ứng dụng đã thiết lập `@playwright/test` với 9 kịch bản kiểm tra phím vật lý thực tế trên trình duyệt Chromium (Ctrl+B, Ctrl+I, Ctrl+Alt+1..3, Ctrl+Shift+8/7/B, Ctrl+Shift+S, Ctrl+U, Ctrl+/, Enter/Backspace thông minh, Undo/Redo, Input rules tiếng Việt). Toàn bộ 9 kịch bản chạy xanh 100% cả cục bộ và trên GitHub Actions CI.
 
