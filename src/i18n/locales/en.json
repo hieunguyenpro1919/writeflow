@@ -48,5 +48,12 @@
     "block": "Blocks",
     "edit": "Editing",
     "help": "Help"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "search": "Search shortcuts...",
+    "noResult": "No shortcuts found",
+    "close": "Close",
+    "open": "Shortcuts"
   }
 }

@@ -48,5 +48,12 @@
     "block": "Khối nội dung",
     "edit": "Chỉnh sửa",
     "help": "Trợ giúp"
+  },
+  "shortcuts": {
+    "title": "Phím tắt",
+    "search": "Tìm kiếm phím tắt...",
+    "noResult": "Không tìm thấy phím tắt phù hợp",
+    "close": "Đóng",
+    "open": "Phím tắt"
   }
 }
