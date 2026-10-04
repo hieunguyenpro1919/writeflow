@@ -18,5 +18,35 @@
   },
   "hint": {
     "unsupportedFormat": "Định dạng này không được hỗ trợ trong Markdown"
+  },
+  "cmd": {
+    "format": {
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "strike": "Gạch ngang",
+      "code": "Mã nội dòng"
+    },
+    "block": {
+      "paragraph": "Đoạn văn",
+      "heading1": "Tiêu đề 1",
+      "heading2": "Tiêu đề 2",
+      "heading3": "Tiêu đề 3",
+      "bulletList": "Danh sách dấu chấm",
+      "orderedList": "Danh sách số",
+      "blockquote": "Trích dẫn"
+    },
+    "edit": {
+      "undo": "Hoàn tác",
+      "redo": "Làm lại"
+    },
+    "help": {
+      "shortcuts": "Phím tắt"
+    }
+  },
+  "category": {
+    "format": "Định dạng",
+    "block": "Khối nội dung",
+    "edit": "Chỉnh sửa",
+    "help": "Trợ giúp"
   }
 }

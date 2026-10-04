@@ -18,5 +18,35 @@
   },
   "hint": {
     "unsupportedFormat": "This format is not supported in Markdown"
+  },
+  "cmd": {
+    "format": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "strike": "Strikethrough",
+      "code": "Inline code"
+    },
+    "block": {
+      "paragraph": "Paragraph",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "blockquote": "Blockquote"
+    },
+    "edit": {
+      "undo": "Undo",
+      "redo": "Redo"
+    },
+    "help": {
+      "shortcuts": "Keyboard shortcuts"
+    }
+  },
+  "category": {
+    "format": "Formatting",
+    "block": "Blocks",
+    "edit": "Editing",
+    "help": "Help"
   }
 }
