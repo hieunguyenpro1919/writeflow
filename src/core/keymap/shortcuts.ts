@@ -52,3 +52,6 @@ export function normalizeShortcut(accel: string): string {
 
   return parts.join('-');
 }
+
+export const TIPTAP_BLOCKQUOTE_DEFAULT_KEY = 'Mod-Shift-b';
+export const TIPTAP_HARDBREAK_DEFAULT_KEY = 'Mod-Enter';

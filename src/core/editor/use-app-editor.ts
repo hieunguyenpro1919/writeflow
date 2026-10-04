@@ -2,6 +2,7 @@ import { useEditor, type Editor } from '@tiptap/react';
 import type { JSONContent } from '@tiptap/core';
 import { useTranslation } from 'react-i18next';
 import { createExtensions } from './extensions';
+import { defaultCommandRegistry } from '../commands/registry';
 import { detectPlatform } from '../keymap/platform';
 import { formatShortcut } from '../keymap/format';
 
@@ -31,7 +32,8 @@ export function useAppEditor(options?: UseAppEditorOptions): Editor | null {
   const { t } = useTranslation();
   const platform = detectPlatform();
 
-  const shortcutHint = formatShortcut('Mod-/', platform);
+  const helpShortcuts = defaultCommandRegistry.getShortcuts('help.shortcuts', platform);
+  const shortcutHint = helpShortcuts.length > 0 ? formatShortcut(helpShortcuts[0], platform) : '';
   const defaultContent = createWelcomeContent(
     t('welcome.title'),
     t('welcome.hint', { shortcut: shortcutHint }),

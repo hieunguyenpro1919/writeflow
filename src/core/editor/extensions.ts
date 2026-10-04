@@ -5,6 +5,7 @@ import { SmartKeysExtension } from './smart-keys';
 import type { CommandRegistry, Platform, UiBridge } from '../commands/types';
 import { defaultCommandRegistry } from '../commands/registry';
 import { detectPlatform } from '../keymap/platform';
+import { TIPTAP_BLOCKQUOTE_DEFAULT_KEY, TIPTAP_HARDBREAK_DEFAULT_KEY } from '../keymap/shortcuts';
 import { defaultUiBridge } from '../../components/ui/toast-manager';
 
 export interface CreateExtensionsOptions {
@@ -37,7 +38,7 @@ export const CustomStarterKit = StarterKit.extend({
           addKeyboardShortcuts() {
             const parent = this.parent ? this.parent() : {};
             const kept = { ...parent };
-            delete kept['Mod-Shift-b'];
+            delete kept[TIPTAP_BLOCKQUOTE_DEFAULT_KEY];
             return kept;
           },
         });
@@ -49,7 +50,7 @@ export const CustomStarterKit = StarterKit.extend({
           addKeyboardShortcuts() {
             const parent = this.parent ? this.parent() : {};
             const kept = { ...parent };
-            delete kept['Mod-Enter'];
+            delete kept[TIPTAP_HARDBREAK_DEFAULT_KEY];
             return kept;
           },
         });
