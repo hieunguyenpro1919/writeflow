@@ -24,6 +24,10 @@
   --editor-text-warning: #b45309;
   --editor-text-success: #15803d;
 
+  /* Toast notification (Task 1.4) */
+  --editor-bg-toast: #0f172a;
+  --editor-text-toast: #f8fafc;
+
   /* Viền, bo góc */
   --editor-border-color: #e2e8f0;
   --editor-border-focus: #3b82f6;

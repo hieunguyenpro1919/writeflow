@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppEditor } from './core/editor/use-app-editor';
 import { TiptapEditor } from './components/editor/TiptapEditor';
+import { ToastHost } from './components/ui/ToastHost';
 import './styles/globals.css';
 import './styles/editor.css';
 
@@ -44,6 +45,7 @@ export function App() {
       <main style={{ flex: 1, overflowY: 'auto' }}>
         <TiptapEditor editor={editor} />
       </main>
+      <ToastHost />
     </div>
   );
 }
