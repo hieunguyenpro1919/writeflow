@@ -13,22 +13,24 @@ export interface StatusBarProps {
 export const StatusBar: React.FC<StatusBarProps> = ({ editor, onOpenShortcuts }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState<DocumentStats>(() => {
-    if (!editor) return { words: 0, chars: 0 };
+    if (!editor?.state?.doc) return { words: 0, chars: 0 };
     return countDocStats(editor.state.doc);
   });
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor?.state?.doc) return;
 
     const updateStats = () => {
-      setStats(countDocStats(editor.state.doc));
+      if (editor?.state?.doc) {
+        setStats(countDocStats(editor.state.doc));
+      }
     };
 
     updateStats();
 
-    editor.on('transaction', updateStats);
+    editor.on?.('transaction', updateStats);
     return () => {
-      editor.off('transaction', updateStats);
+      editor.off?.('transaction', updateStats);
     };
   }, [editor]);
 

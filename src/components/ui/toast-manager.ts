@@ -1,4 +1,5 @@
 import type { UiBridge } from '../../core/commands/types';
+import { shortcutsDialogManager } from '../shortcuts/shortcuts-dialog-manager';
 
 export interface ToastItem {
   id: string;
@@ -75,7 +76,7 @@ export const toastManager = new ToastManager();
 
 export function createUiBridge(overrides?: Partial<UiBridge>): UiBridge {
   return {
-    openShortcutsDialog: overrides?.openShortcutsDialog ?? (() => {}),
+    openShortcutsDialog: overrides?.openShortcutsDialog ?? (() => shortcutsDialogManager.toggle()),
     notify: overrides?.notify ?? ((key, opts) => toastManager.notify(key, opts)),
   };
 }

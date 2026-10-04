@@ -3,6 +3,7 @@ import { useAppEditor } from './core/editor/use-app-editor';
 import { TiptapEditor } from './components/editor/TiptapEditor';
 import { ToastHost } from './components/ui/ToastHost';
 import { StatusBar } from './components/status/StatusBar';
+import { ShortcutsDialog } from './components/shortcuts/ShortcutsDialog';
 import './styles/globals.css';
 import './styles/editor.css';
 
@@ -39,6 +40,7 @@ export function App() {
 
       <StatusBar editor={editor} />
       <ToastHost />
+      <ShortcutsDialog editor={editor} />
     </div>
   );
 }

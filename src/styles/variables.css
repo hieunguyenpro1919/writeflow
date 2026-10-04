@@ -11,6 +11,7 @@
   --editor-bg-active: #e2e8f0;
   --editor-bg-code: #f1f5f9;
   --editor-bg-selection: #c7d2fe;
+  --editor-bg-backdrop: rgba(0, 0, 0, 0.4);
 
   /* Chữ */
   --editor-text-primary: #0f172a;
