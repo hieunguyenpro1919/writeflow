@@ -26,6 +26,7 @@
 | Package | Phiên bản ghim | Giấy phép | Mục đích |
 | :--- | :--- | :--- | :--- |
 | `@eslint/js` | `9.39.5` | MIT | Cấu hình ESLint JavaScript chuẩn |
+| `@playwright/test` | `1.63.0` | Apache-2.0 | Khung kiểm thử tự động End-to-End (E2E) |
 | `@testing-library/dom` | `10.4.2` | MIT | Tiện ích DOM testing |
 | `@testing-library/jest-dom` | `6.9.1` | MIT | Matcher bổ trợ cho DOM testing |
 | `@testing-library/react` | `16.3.3` | MIT | Tiện ích kiểm thử component React |

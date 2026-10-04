@@ -4,3 +4,5 @@ dist/
 *.log
 spikes/**/node_modules/
 spikes/**/dist/
+test-results/
+playwright-report/
