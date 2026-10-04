@@ -288,4 +288,30 @@ describe('Task 1.9: Enter thông minh & Backspace', () => {
       document.body.removeChild(container);
     });
   });
+
+  describe('8. Bảo vệ bộ gõ tiếng Việt (IME composition) cho phím Backspace', () => {
+    it('không can thiệp hoặc chuyển đổi khối khi view.composing đang là true', () => {
+      editor = new Editor({
+        extensions: createExtensions(),
+        content: '<h1>Tiêu đề thử nghiệm</h1>',
+      });
+
+      // Position cursor at start of heading (where SmartKeys would normally convert to paragraph)
+      editor.commands.setTextSelection(1);
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+
+      // Simulate IME composition (e.g. Unikey is composing a Vietnamese character)
+      Object.defineProperty(editor.view, 'composing', { value: true, configurable: true });
+
+      // Press Backspace while composing
+      pressKey('Backspace');
+
+      // The heading must NOT be converted to a paragraph because IME is composing
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+      expect(editor.getHTML()).toContain('<h1>Tiêu đề thử nghiệm</h1>');
+
+      // Reset composing
+      Object.defineProperty(editor.view, 'composing', { value: false, configurable: true });
+    });
+  });
 });

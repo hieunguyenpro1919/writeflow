@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import './core/commands';
 import { useAppEditor } from './core/editor/use-app-editor';
 import { TiptapEditor } from './components/editor/TiptapEditor';
 import { ToastHost } from './components/ui/ToastHost';

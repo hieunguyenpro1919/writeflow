@@ -14,6 +14,11 @@ export const SmartKeysExtension = Extension.create({
   addKeyboardShortcuts() {
     return {
       Backspace: () => {
+        // IME Protection: Never intercept Backspace while typing with IME (Unikey/EVKey composition)
+        if (this.editor.view.composing) {
+          return false;
+        }
+
         const { state, dispatch } = this.editor.view;
         const { selection } = state;
 

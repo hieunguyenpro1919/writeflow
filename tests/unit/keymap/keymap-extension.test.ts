@@ -86,6 +86,19 @@ describe('Task 1.8: Keymap Extension & IME Protection', () => {
       expect(editor.getHTML()).toContain('<s>Nội dung</s>');
     });
 
+    it('executes Mod-e to toggle inline code on selection', () => {
+      editor.commands.setTextSelection({ from: 1, to: 9 });
+      expect(editor.isActive('code')).toBe(false);
+
+      dispatchKeydown(editor.view.dom, {
+        key: 'e',
+        ctrlKey: true,
+      });
+
+      expect(editor.isActive('code')).toBe(true);
+      expect(editor.getHTML()).toContain('<code>Nội dung</code>');
+    });
+
     it('Ctrl+Shift+S (Mod-Shift-s) does NOT strike text (default removed)', () => {
       editor.commands.setTextSelection({ from: 1, to: 9 });
       expect(editor.isActive('strike')).toBe(false);
@@ -116,6 +129,56 @@ describe('Task 1.8: Keymap Extension & IME Protection', () => {
       // Ctrl+Shift+9
       dispatchKeydown(editor.view.dom, { key: '9', ctrlKey: true, shiftKey: true });
       expect(editor.getHTML()).toBe(initialHtml);
+    });
+  });
+
+  describe('Phím khối nội dung (Block shortcuts)', () => {
+    it('executes Mod-Alt-1/2/3 to toggle headings and Mod-Alt-0 for paragraph', () => {
+      editor.commands.setTextSelection(1);
+
+      // Mod-Alt-1 -> Heading 1
+      dispatchKeydown(editor.view.dom, { key: '1', ctrlKey: true, altKey: true });
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+
+      // Mod-Alt-2 -> Heading 2
+      dispatchKeydown(editor.view.dom, { key: '2', ctrlKey: true, altKey: true });
+      expect(editor.isActive('heading', { level: 2 })).toBe(true);
+
+      // Mod-Alt-3 -> Heading 3
+      dispatchKeydown(editor.view.dom, { key: '3', ctrlKey: true, altKey: true });
+      expect(editor.isActive('heading', { level: 3 })).toBe(true);
+
+      // Mod-Alt-0 -> Paragraph
+      dispatchKeydown(editor.view.dom, { key: '0', ctrlKey: true, altKey: true });
+      expect(editor.isActive('paragraph')).toBe(true);
+      expect(editor.isActive('heading')).toBe(false);
+    });
+
+    it('executes Mod-Shift-8 for bullet list and Mod-Shift-7 for ordered list', () => {
+      editor.commands.setTextSelection(1);
+
+      // Mod-Shift-8 -> Bullet List
+      dispatchKeydown(editor.view.dom, { key: '8', ctrlKey: true, shiftKey: true });
+      expect(editor.isActive('bulletList')).toBe(true);
+
+      // Mod-Shift-7 -> Ordered List
+      dispatchKeydown(editor.view.dom, { key: '7', ctrlKey: true, shiftKey: true });
+      expect(editor.isActive('orderedList')).toBe(true);
+    });
+
+    it('executes Mod-Shift-B to toggle blockquote', () => {
+      editor.commands.setParagraph();
+      editor.commands.setTextSelection(1);
+      expect(editor.isActive('blockquote')).toBe(false);
+
+      // Mod-Shift-b -> Blockquote
+      dispatchKeydown(editor.view.dom, { key: 'b', ctrlKey: true, shiftKey: true });
+      expect(editor.isActive('blockquote')).toBe(true);
+    });
+
+    it('executes Mod-/ to trigger help.shortcuts and open shortcuts dialog', () => {
+      dispatchKeydown(editor.view.dom, { key: '/', ctrlKey: true });
+      expect(mockUi.openShortcutsDialog).toHaveBeenCalledTimes(1);
     });
   });
 
