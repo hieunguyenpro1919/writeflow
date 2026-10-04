@@ -1,6 +1,7 @@
 import StarterKit from '@tiptap/starter-kit';
 import type { Extensions, AnyExtension } from '@tiptap/core';
 import { KeymapExtension } from '../keymap/keymap-extension';
+import { SmartKeysExtension } from './smart-keys';
 import type { CommandRegistry, Platform, UiBridge } from '../commands/types';
 import { defaultCommandRegistry } from '../commands/registry';
 import { detectPlatform } from '../keymap/platform';
@@ -78,6 +79,7 @@ export function createExtensions(options?: CreateExtensionsOptions): Extensions 
         levels: [1, 2, 3, 4, 5, 6],
       },
     }),
+    SmartKeysExtension,
     KeymapExtension.configure({
       registry: options?.registry ?? defaultCommandRegistry,
       platform: options?.platform ?? detectPlatform(),
