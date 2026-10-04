@@ -15,3 +15,9 @@
 | **P1-D5** | Tắt các extension chưa thuộc Phase 1 | Tắt **Underline, Link, CodeBlock, HorizontalRule, TrailingNode** | Tránh kích hoạt ngoài ý muốn các rule chưa có cơ chế serialize (Plan 4.3). Dán HTML có chứa link/code block tạm thời chỉ giữ text thuần ở Phase 1; sẽ hỗ trợ đầy đủ tại Phase 6. |
 | **P1-D6** | Ngắt dòng cứng | Chỉ **Shift+Enter**. Bỏ `Mod-Enter` khỏi ngắt dòng | Dành `Mod-Enter` cho tính năng thoát khối mã ở Phase 6 (Plan 7.2). |
 | **P1-D7** | Nội dung khởi đầu của editor | Văn bản chào ngắn tạo từ i18n kèm gợi ý phím tắt `Ctrl+/` (hoặc `⌘/`) | Tạo trải nghiệm tự khám phá thân thiện cho người dùng ngay lần đầu mở app. |
+
+---
+
+### Ghi chú bổ sung cuối Phase 1:
+- **Quyết định tinh gọn Task 1.14 (E2E Playwright):** Theo chỉ đạo của PO trong Task Card Nhóm E, dự án tạm hoãn triển khai Playwright E2E tự động tại Phase 1 để giữ nhịp độ tinh gọn; toàn bộ 9 kịch bản tương tác bàn phím và bộ gõ tiếng Việt được chuyển sang thực hiện thủ công có hướng dẫn tại `docs/qa/phase-1-manual.md`, kết hợp cùng 174 test tự động (unit/component/guards) đạt 100% tỷ lệ vượt qua.
+
