@@ -155,18 +155,10 @@ test.describe('Task 1.14: E2E Physical Keyboard & Shortcuts (Chromium)', () => {
     await page.keyboard.type('My Heading');
     await expect(editor.locator('h1')).toHaveText('My Heading');
 
-    // Move caret to exact start of h1 (offset 0)
-    await page.evaluate(() => {
-      const h1 = document.querySelector('h1');
-      if (h1 && h1.firstChild) {
-        const range = document.createRange();
-        range.setStart(h1.firstChild, 0);
-        range.collapse(true);
-        const sel = window.getSelection();
-        sel?.removeAllRanges();
-        sel?.addRange(range);
-      }
-    });
+    // Di chuyển con trỏ về đầu khối heading bằng ArrowLeft chuẩn Playwright
+    for (let i = 0; i < 'My Heading'.length; i++) {
+      await page.keyboard.press('ArrowLeft', { delay: 25 });
+    }
 
     // Backspace at offset 0 converts heading to paragraph without merging into previous block
     await page.keyboard.press('Backspace');

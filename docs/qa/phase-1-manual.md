@@ -60,7 +60,7 @@ Tài liệu hướng dẫn PO hoặc QA thực hiện kiểm thử thực tế t
   - Trình duyệt / WebView: Edge / Chrome (Chromium)
   - Bộ gõ tiếng Việt: Unikey / EVKey (Bảng mã Unicode dựng sẵn, kiểu gõ Telex & VNI)
 - **Kết luận:**
-  - [ ] **ĐẠT:** Tất cả các ca kiểm thử hoạt động đúng như thiết kế, không có lỗi chặn, tiếng Việt mượt mà.
+  - [X] **ĐẠT:** Tất cả các ca kiểm thử hoạt động đúng như thiết kế, không có lỗi chặn, tiếng Việt mượt mà.
   - [ ] **CẦN SỬA ĐỔI:** (Ghi chú cụ thể các bước chưa đạt dưới đây).
 
 *Ghi chú thêm:*

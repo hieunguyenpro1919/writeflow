@@ -5,15 +5,32 @@ import { createExtensions } from '../../../src/core/editor/extensions';
 describe('Task 1.9: Enter thông minh & Backspace', () => {
   let editor: Editor;
 
-  function pressKey(key: string, modifiers?: { shiftKey?: boolean; ctrlKey?: boolean }): boolean {
+  function pressKey(
+    key: string,
+    modifiers?: {
+      shiftKey?: boolean;
+      ctrlKey?: boolean;
+      isComposing?: boolean;
+      keyCode?: number;
+    },
+  ): boolean {
     const event = new KeyboardEvent('keydown', {
       key,
       bubbles: true,
       cancelable: true,
       shiftKey: modifiers?.shiftKey ?? false,
       ctrlKey: modifiers?.ctrlKey ?? false,
+      isComposing: modifiers?.isComposing ?? false,
     });
-    return editor.view.dom.dispatchEvent(event);
+    if (modifiers?.keyCode !== undefined) {
+      Object.defineProperty(event, 'keyCode', { value: modifiers.keyCode, configurable: true });
+    }
+    (window as unknown as { event?: KeyboardEvent }).event = event;
+    try {
+      return editor.view.dom.dispatchEvent(event);
+    } finally {
+      (window as unknown as { event?: KeyboardEvent }).event = undefined;
+    }
   }
 
   function findTextPos(textToFind: string): number {
@@ -312,6 +329,38 @@ describe('Task 1.9: Enter thông minh & Backspace', () => {
 
       // Reset composing
       Object.defineProperty(editor.view, 'composing', { value: false, configurable: true });
+    });
+
+    it('không can thiệp hoặc chuyển đổi khối khi event.isComposing đang là true', () => {
+      editor = new Editor({
+        extensions: createExtensions(),
+        content: '<h1>Tiêu đề thử nghiệm</h1>',
+      });
+
+      editor.commands.setTextSelection(1);
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+
+      // Press Backspace with event.isComposing = true
+      pressKey('Backspace', { isComposing: true });
+
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+      expect(editor.getHTML()).toContain('<h1>Tiêu đề thử nghiệm</h1>');
+    });
+
+    it('không can thiệp hoặc chuyển đổi khối khi event.keyCode === 229 (IME keyCode)', () => {
+      editor = new Editor({
+        extensions: createExtensions(),
+        content: '<h1>Tiêu đề thử nghiệm</h1>',
+      });
+
+      editor.commands.setTextSelection(1);
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+
+      // Press Backspace with keyCode 229
+      pressKey('Backspace', { keyCode: 229 });
+
+      expect(editor.isActive('heading', { level: 1 })).toBe(true);
+      expect(editor.getHTML()).toContain('<h1>Tiêu đề thử nghiệm</h1>');
     });
   });
 });
