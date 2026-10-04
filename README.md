@@ -1,5 +1,7 @@
 # WriteFlow
 
+[![CI](https://github.com/hieunguyenpro1919/writeflow/actions/workflows/ci.yml/badge.svg)](https://github.com/hieunguyenpro1919/writeflow/actions/workflows/ci.yml)
+
 Trình soạn thảo tài liệu Markdown WYSIWYG mã nguồn mở, tối giản và an toàn dữ liệu.
 
 > **Tuyên ngôn sản phẩm:** Soạn tài liệu dễ trước. Markdown đúng phía sau.  
@@ -9,7 +11,7 @@ Trình soạn thảo tài liệu Markdown WYSIWYG mã nguồn mở, tối giản
 
 ## 1. Trạng Thái Dự Án
 
-- **Phase hiện tại:** Phase 0 — Bootstrap Project (Hoàn tất)
+- **Phase hoàn thành:** Phase 0 — Bootstrap Project (đã hoàn tất bao gồm Phase 0.1)
 - **Phase tiếp theo:** Phase 1 — Core Editor + Command System + Phím tắt
 - **Nguồn sự thật:** Đọc [docs/PLAN.md](docs/PLAN.md) và [AGENTS.md](AGENTS.md).
 
@@ -20,17 +22,18 @@ Trình soạn thảo tài liệu Markdown WYSIWYG mã nguồn mở, tối giản
 Yêu cầu môi trường: **Node.js >= 20** và **npm >= 10**.
 
 ```bash
-# 1. Cài đặt các gói phụ thuộc
-npm install
+# 1. Cài đặt các gói phụ thuộc (theo lockfile)
+npm ci
 
 # 2. Khởi động môi trường phát triển (Dev server)
 npm run dev
 
-# 3. Kiểm tra chất lượng mã nguồn
+# 3. Quy trình kiểm tra chất lượng mã nguồn (tương đương CI pipeline)
 npm run typecheck    # Kiểm tra kiểu TypeScript (strict mode)
-npm run lint         # Linter tĩnh ESLint
-npm run test         # Chạy bộ test tự động Vitest
-npm run build        # Đóng gói sản phẩm (Production build)
+npm run lint         # Linter tĩnh ESLint (0 warnings, 0 errors)
+npm run format       # Kiểm tra định dạng mã nguồn (Prettier)
+npm run test         # Chạy bộ test tự động (Vitest)
+npm run build        # Đóng gói sản phẩm (Vite production build)
 ```
 
 ---
