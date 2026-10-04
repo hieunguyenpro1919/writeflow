@@ -1,18 +1,16 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import './core/commands';
+import { useAppEditor } from './core/editor/use-app-editor';
 import { TiptapEditor } from './components/editor/TiptapEditor';
+import { ToastHost } from './components/ui/ToastHost';
+import { StatusBar } from './components/status/StatusBar';
+import { ShortcutsDialog } from './components/shortcuts/ShortcutsDialog';
 import './styles/globals.css';
 import './styles/editor.css';
 
 export function App() {
   const { t } = useTranslation();
-  const [contentLength, setContentLength] = useState<number>(0);
-
-  const handleUpdate = (text: string) => {
-    setContentLength(text.trim().length);
-  };
-
-  const initialContent = `<h1>${t('phase0.welcomeTitle')}</h1><p>${t('phase0.welcomeSubtitle')}</p>`;
+  const editor = useAppEditor();
 
   return (
     <div className="editor-container">
@@ -35,14 +33,15 @@ export function App() {
             {t('app.tagline')}
           </span>
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--editor-text-muted)' }}>
-          {t('status.chars', { count: contentLength })}
-        </div>
       </header>
 
       <main style={{ flex: 1, overflowY: 'auto' }}>
-        <TiptapEditor initialContent={initialContent} onUpdate={handleUpdate} />
+        <TiptapEditor editor={editor} />
       </main>
+
+      <StatusBar editor={editor} />
+      <ToastHost />
+      <ShortcutsDialog editor={editor} />
     </div>
   );
 }

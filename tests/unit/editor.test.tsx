@@ -1,16 +1,40 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { Editor } from '@tiptap/core';
 import { TiptapEditor } from '../../src/components/editor/TiptapEditor';
+import { createExtensions } from '../../src/core/editor/extensions';
 
-describe('TiptapEditor (Phase 0 Minimal Shell)', () => {
+describe('TiptapEditor Component', () => {
   it('renders the editor surface without throwing', () => {
-    render(<TiptapEditor initialContent="<p>Test content</p>" />);
+    const editor = new Editor({
+      extensions: createExtensions(),
+      content: { type: 'doc', content: [{ type: 'paragraph' }] },
+    });
+
+    render(<TiptapEditor editor={editor} />);
     const editorPaper = screen.getByTestId('editor-paper');
     expect(editorPaper).toBeInTheDocument();
+
+    editor.destroy();
   });
 
-  it('renders initial text correctly inside ProseMirror', () => {
-    render(<TiptapEditor initialContent="<p>Xin chào WriteFlow</p>" />);
+  it('renders text correctly inside ProseMirror', () => {
+    const editor = new Editor({
+      extensions: createExtensions(),
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Xin chào WriteFlow' }],
+          },
+        ],
+      },
+    });
+
+    render(<TiptapEditor editor={editor} />);
     expect(screen.getByText('Xin chào WriteFlow')).toBeInTheDocument();
+
+    editor.destroy();
   });
 });

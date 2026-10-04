@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, phase-1]
   pull_request:
-    branches: [main]
+    branches: [main, phase-1]
 
 jobs:
   ci:
@@ -38,3 +38,9 @@ jobs:
 
       - name: Build production bundle (Vite)
         run: npm run build
+
+      - name: Install Playwright Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests (Playwright)
+        run: npm run test:e2e

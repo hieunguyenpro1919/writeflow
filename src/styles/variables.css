@@ -11,6 +11,7 @@
   --editor-bg-active: #e2e8f0;
   --editor-bg-code: #f1f5f9;
   --editor-bg-selection: #c7d2fe;
+  --editor-bg-backdrop: rgba(0, 0, 0, 0.4);
 
   /* Chữ */
   --editor-text-primary: #0f172a;
@@ -23,6 +24,10 @@
   --editor-text-error: #b91c1c;
   --editor-text-warning: #b45309;
   --editor-text-success: #15803d;
+
+  /* Toast notification (Task 1.4) */
+  --editor-bg-toast: #0f172a;
+  --editor-text-toast: #f8fafc;
 
   /* Viền, bo góc */
   --editor-border-color: #e2e8f0;

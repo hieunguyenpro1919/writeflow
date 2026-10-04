@@ -205,13 +205,26 @@ Giao diện với hệ điều hành đi qua các "service" có interface rõ r�
 ## 6.1. Interface
 
 ```ts
+interface UiBridge {
+  openShortcutsDialog(): void;
+  notify(messageKey: string, opts?: Record<string, unknown>): void;
+}
+
+interface CommandContext {
+  editor: Editor;
+  ui: UiBridge;
+}
+
 interface CommandDef {
   id: string;                    // ví dụ "format.bold" — duy nhất, ổn định, không đổi tên về sau
   labelKey: string;              // khóa i18n, ví dụ "cmd.format.bold"
   descriptionKey?: string;       // mô tả ngắn cho tooltip
   icon?: string;                 // tên icon
   category: "format" | "block" | "insert" | "file" | "edit" | "view" | "help";
-  defaultShortcut?: { win?: string; mac?: string };   // ví dụ "Mod-b"
+  defaultShortcut?: {
+    win?: string | string[];     // ví dụ "Mod-b" hoặc ["Mod-y", "Mod-Shift-z"]
+    mac?: string | string[];     // ví dụ "Cmd-b" hoặc ["Cmd-Shift-z"]
+  };
   run(ctx: CommandContext, args?: unknown): boolean;  // trả về true nếu đã xử lý
   isEnabled?(ctx: CommandContext): boolean;           // có thể dùng lúc này không
   isActive?(ctx: CommandContext): boolean;            // trạng thái bật (nút Bold sáng lên)
@@ -287,7 +300,8 @@ Ký hiệu: **Mod** = Ctrl (Windows/Linux) hoặc Cmd (macOS). Danh sách này l
 Input rule (gõ `# ` ra tiêu đề) là **tiện ích cho người dùng nâng cao**, không phải đường trải nghiệm chính. Danh sách ở cột "Gõ nhanh" của bảng 7.1.
 
 Mỗi input rule phải:
-- **hoàn tác được bằng một lần Ctrl+Z** (lần Undo đầu tiên trả lại đúng ký tự đã gõ, ví dụ `# `);
+- **hoàn tác được bằng một lần Ctrl+Z** (lần Undo đầu tiên trả lại đúng ký tự thô đã gõ, ví dụ `# `);
+- **xử lý Backspace ngay sau khi kích hoạt:** nếu người dùng bấm Backspace ngay sau khi vừa gõ `# ` (đang ở tiêu đề rỗng), khối tiêu đề sẽ chuyển thành đoạn văn rỗng `<p></p>` (xóa khối); muốn hoàn tác trả lại ký tự thô `# `, dùng **Ctrl+Z**;
 - chỉ kích hoạt ở vị trí hợp lệ (ví dụ `# ` chỉ ở đầu dòng);
 - **không kích hoạt khi đang soạn dấu tiếng Việt** (xem 8.2).
 
@@ -720,7 +734,7 @@ markdown-editor/
 
 Nguyên tắc: module phản ánh **trách nhiệm**, không tách file chỉ để đạt số dòng.
 
-**CI tối thiểu (từ Phase 0):** cài đặt theo lockfile → `tsc --noEmit` → lint → Vitest → build. Từ Phase 2 thêm round-trip corpus. Từ Phase 4 thêm Playwright. Pull request không qua CI thì không merge.
+**CI tối thiểu (từ Phase 0):** cài đặt theo lockfile → `tsc --noEmit` → lint → Vitest → build. Từ Phase 1 kích hoạt Playwright E2E trên Chromium để kiểm chứng sự kiện phím vật lý thật. Từ Phase 2 thêm round-trip corpus. Pull request không qua CI thì không merge.
 
 # 20. ROADMAP BUILD
 
@@ -1101,7 +1115,7 @@ type OpenResult = { path: string; text: string; encoding: "utf-8"; bom: boolean;
 2. Gõ một câu, bôi đen, bấm **Ctrl+B**, rồi **Ctrl+I**. Bấm lại để tắt.
 3. Bấm **Ctrl+Alt+1** ở một dòng → thành tiêu đề lớn; **Ctrl+Alt+0** → trở lại chữ thường.
 4. Bấm **Ctrl+Shift+8** → danh sách; Enter vài lần; Enter ở dòng trống → thoát danh sách.
-5. Gõ `# ` rồi chữ → thành tiêu đề; Ctrl+Z → trả lại `# `.
+5. Gõ `# ` rồi chữ → thành tiêu đề; Ctrl+Z → trả lại `# `; bấm Backspace ngay sau khi kích hoạt `# ` (đang ở tiêu đề rỗng) → chuyển thành đoạn rỗng `<p></p>`.
 6. Bấm **Ctrl+U** → có gợi ý "không hỗ trợ".
 7. **Ctrl+/** → xem danh sách phím tắt.
 8. Gõ tiếng Việt dài bằng Unikey/EVKey (Telex hoặc VNI) trong đoạn, tiêu đề, danh sách.

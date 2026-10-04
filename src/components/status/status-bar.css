@@ -1,0 +1,55 @@
+.status-bar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: var(--editor-bg-toolbar);
+  border-top: 1px solid var(--editor-border-color);
+  font-family: var(--editor-font-family);
+  font-size: 12px;
+  color: var(--editor-text-secondary);
+  user-select: none;
+}
+
+.status-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-bar-divider {
+  color: var(--editor-text-muted);
+}
+
+.status-bar-button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--editor-radius-sm);
+  color: var(--editor-text-secondary);
+  font-family: var(--editor-font-family);
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.status-bar-button:hover {
+  background-color: var(--editor-bg-hover);
+  color: var(--editor-text-primary);
+}
+
+.status-bar-button:focus-visible {
+  outline: 2px solid var(--editor-border-focus);
+  outline-offset: 1px;
+}

@@ -11,8 +11,13 @@ Trình soạn thảo tài liệu Markdown WYSIWYG mã nguồn mở, tối giản
 
 ## 1. Trạng Thái Dự Án
 
-- **Phase hoàn thành:** Phase 0 — Bootstrap Project (đã hoàn tất bao gồm Phase 0.1)
-- **Phase tiếp theo:** Phase 1 — Core Editor + Command System + Phím tắt
+- **Phase hiện tại:** **Phase 1 — Core Editor + Command System + Phím tắt (Đang chờ duyệt)**
+  - Đã triển khai hoàn chỉnh toàn bộ các task (Nhóm A, B, C, D, E) trên nhánh `phase-1`.
+  - Tự động nạp 14 command lõi vào Registry ngay khi khởi động ứng dụng; phím tắt vật lý (có bảo vệ IME cho cả phím tắt và Backspace), thoát khối thông minh, thanh trạng thái thời gian thực và hộp thoại phím tắt sinh động từ registry.
+  - Hệ thống kiểm thử tự động phòng thủ (Guard Tests) quét sạch mã rác, hard-code màu và phím tắt.
+  - Bộ kiểm thử End-to-End tự động (Playwright) với 9 kịch bản phím bấm thực tế trên Chromium đạt 100% tỷ lệ vượt qua.
+- **Kịch bản kiểm thử thủ công:** Tham khảo [docs/qa/phase-1-manual.md](docs/qa/phase-1-manual.md) để tự kiểm tra bằng bàn phím và bộ gõ tiếng Việt.
+- **Phase tiếp theo:** Phase 2 — Markdown In/Out & Xử lý mất dữ liệu
 - **Nguồn sự thật:** Đọc [docs/PLAN.md](docs/PLAN.md) và [AGENTS.md](AGENTS.md).
 
 ---
