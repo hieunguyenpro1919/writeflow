@@ -1,5 +1,16 @@
 import StarterKit from '@tiptap/starter-kit';
 import type { Extensions, AnyExtension } from '@tiptap/core';
+import { KeymapExtension } from '../keymap/keymap-extension';
+import type { CommandRegistry, Platform, UiBridge } from '../commands/types';
+import { defaultCommandRegistry } from '../commands/registry';
+import { detectPlatform } from '../keymap/platform';
+import { defaultUiBridge } from '../../components/ui/toast-manager';
+
+export interface CreateExtensionsOptions {
+  registry?: CommandRegistry;
+  platform?: Platform;
+  ui?: UiBridge;
+}
 
 export const CustomStarterKit = StarterKit.extend({
   addExtensions() {
@@ -52,7 +63,7 @@ export const CustomStarterKit = StarterKit.extend({
  * Creates the official core extensions for WriteFlow Phase 1.
  * Pure function: testable in isolation.
  */
-export function createExtensions(): Extensions {
+export function createExtensions(options?: CreateExtensionsOptions): Extensions {
   return [
     CustomStarterKit.configure({
       // P1-D5: Tắt các extension chưa thuộc Phase 1
@@ -66,6 +77,11 @@ export function createExtensions(): Extensions {
       heading: {
         levels: [1, 2, 3, 4, 5, 6],
       },
+    }),
+    KeymapExtension.configure({
+      registry: options?.registry ?? defaultCommandRegistry,
+      platform: options?.platform ?? detectPlatform(),
+      ui: options?.ui ?? defaultUiBridge,
     }),
   ];
 }
