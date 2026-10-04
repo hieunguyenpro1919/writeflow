@@ -4,13 +4,19 @@
     "tagline": "Trình soạn thảo Markdown WYSIWYG",
     "placeholder": "Bắt đầu viết tài liệu của bạn tại đây..."
   },
+  "editor": {
+    "ariaLabel": "Vùng soạn thảo văn bản"
+  },
   "status": {
     "ready": "Sẵn sàng",
     "words": "{{count}} từ",
     "chars": "{{count}} ký tự"
   },
-  "phase0": {
-    "welcomeTitle": "Chào mừng đến với WriteFlow",
-    "welcomeSubtitle": "Giai đoạn Phase 0 — Bootstrap Project đã được thiết lập thành công."
+  "welcome": {
+    "title": "Chào mừng đến với WriteFlow",
+    "hint": "Nhấn {{shortcut}} để xem danh sách phím tắt"
+  },
+  "hint": {
+    "unsupportedFormat": "Định dạng này không được hỗ trợ trong Markdown"
   }
 }

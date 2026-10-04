@@ -13,11 +13,7 @@ export interface NavigatorPlatformInfo {
  */
 export function detectPlatform(customNav?: NavigatorPlatformInfo): Platform {
   const nav: NavigatorPlatformInfo | undefined =
-    customNav !== undefined
-      ? customNav
-      : typeof navigator !== 'undefined'
-        ? navigator
-        : undefined;
+    customNav !== undefined ? customNav : typeof navigator !== 'undefined' ? navigator : undefined;
 
   if (!nav) {
     return 'win';
@@ -26,7 +22,11 @@ export function detectPlatform(customNav?: NavigatorPlatformInfo): Platform {
   // 1. Check UserAgentData platform (modern standard)
   const uadPlatform = nav.userAgentData?.platform?.toLowerCase();
   if (uadPlatform) {
-    if (uadPlatform.includes('mac') || uadPlatform.includes('ios') || uadPlatform.includes('darwin')) {
+    if (
+      uadPlatform.includes('mac') ||
+      uadPlatform.includes('ios') ||
+      uadPlatform.includes('darwin')
+    ) {
       return 'mac';
     }
     return 'win';
@@ -35,7 +35,12 @@ export function detectPlatform(customNav?: NavigatorPlatformInfo): Platform {
   // 2. Fallback to navigator.platform
   const navPlatform = nav.platform?.toLowerCase();
   if (navPlatform) {
-    if (navPlatform.includes('mac') || navPlatform.includes('darwin') || navPlatform.includes('iphone') || navPlatform.includes('ipad')) {
+    if (
+      navPlatform.includes('mac') ||
+      navPlatform.includes('darwin') ||
+      navPlatform.includes('iphone') ||
+      navPlatform.includes('ipad')
+    ) {
       return 'mac';
     }
     return 'win';

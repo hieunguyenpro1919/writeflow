@@ -4,13 +4,19 @@
     "tagline": "WYSIWYG Markdown Editor",
     "placeholder": "Start writing your document here..."
   },
+  "editor": {
+    "ariaLabel": "Rich text editor"
+  },
   "status": {
     "ready": "Ready",
     "words": "{{count}} words",
     "chars": "{{count}} chars"
   },
-  "phase0": {
-    "welcomeTitle": "Welcome to WriteFlow",
-    "welcomeSubtitle": "Phase 0 — Project Bootstrap has been successfully initialized."
+  "welcome": {
+    "title": "Welcome to WriteFlow",
+    "hint": "Press {{shortcut}} to view keyboard shortcuts"
+  },
+  "hint": {
+    "unsupportedFormat": "This format is not supported in Markdown"
   }
 }

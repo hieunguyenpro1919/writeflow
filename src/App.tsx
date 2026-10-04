@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppEditor } from './core/editor/use-app-editor';
 import { TiptapEditor } from './components/editor/TiptapEditor';
 import './styles/globals.css';
 import './styles/editor.css';
@@ -8,11 +9,11 @@ export function App() {
   const { t } = useTranslation();
   const [contentLength, setContentLength] = useState<number>(0);
 
-  const handleUpdate = (text: string) => {
-    setContentLength(text.trim().length);
-  };
-
-  const initialContent = `<h1>${t('phase0.welcomeTitle')}</h1><p>${t('phase0.welcomeSubtitle')}</p>`;
+  const editor = useAppEditor({
+    onUpdate: (ed) => {
+      setContentLength(ed.getText().trim().length);
+    },
+  });
 
   return (
     <div className="editor-container">
@@ -41,7 +42,7 @@ export function App() {
       </header>
 
       <main style={{ flex: 1, overflowY: 'auto' }}>
-        <TiptapEditor initialContent={initialContent} onUpdate={handleUpdate} />
+        <TiptapEditor editor={editor} />
       </main>
     </div>
   );

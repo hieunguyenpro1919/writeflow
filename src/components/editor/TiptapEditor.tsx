@@ -1,21 +1,11 @@
 import React from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { EditorContent, type Editor } from '@tiptap/react';
 
 interface TiptapEditorProps {
-  initialContent?: string;
-  onUpdate?: (text: string) => void;
+  editor: Editor | null;
 }
 
-export const TiptapEditor: React.FC<TiptapEditorProps> = ({ initialContent = '', onUpdate }) => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: initialContent,
-    onUpdate: ({ editor }) => {
-      onUpdate?.(editor.getText());
-    },
-  });
-
+export const TiptapEditor: React.FC<TiptapEditorProps> = ({ editor }) => {
   return (
     <div className="editor-paper" data-testid="editor-paper">
       <EditorContent editor={editor} data-testid="tiptap-editor-content" />
