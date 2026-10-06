@@ -237,6 +237,25 @@ function wrapSpecialBlocks(doc: JSONContent): JSONContent {
 }
 
 /**
+ * Protects inline HTML comments (e.g. "text <!-- comment --> text") from being stripped
+ * by DOMParser during markdown parsing by converting them into rawInline span elements.
+ * Standalone block comments (entire lines) are left untouched for RawBlockExtension.
+ */
+export function protectInlineComments(md: string): string {
+  const lines = md.split('\n');
+  const processed = lines.map((line) => {
+    // If line is ONLY a comment (optional leading/trailing whitespace), leave it as block comment
+    if (/^\s*<!--[\s\S]*?-->\s*$/.test(line)) {
+      return line;
+    }
+    return line.replace(/<!--([\s\S]*?)-->/g, (_m, comment) => {
+      return `<span data-raw-inline="" data-raw-comment="true">&lt;!--${comment}--&gt;</span>`;
+    });
+  });
+  return processed.join('\n');
+}
+
+/**
  * Main parse function: extracts frontmatter, parses Markdown body into Tiptap JSONContent
  * and ProseMirror Node tree.
  */
@@ -248,8 +267,11 @@ export function parse(rawMarkdown: string, options?: MarkdownOptions): MarkdownP
   const finalEol = options?.eol && options.eol !== 'auto' ? options.eol : detectedEol;
   const finalBOM = options?.preserveBOM !== undefined ? options.preserveBOM && hasBOM : hasBOM;
 
+  // Protect inline comments before parsing through DOMParser
+  const protectedBody = protectInlineComments(body);
+
   // Parse markdown body using schema-aware MarkdownManager
-  let doc = manager.parse(body);
+  let doc = manager.parse(protectedBody);
   doc = wrapSpecialBlocks(doc);
 
   // Convert to ProseMirror Node instance for roundtrip validation

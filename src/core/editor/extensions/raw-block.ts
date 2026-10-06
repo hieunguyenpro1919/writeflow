@@ -220,19 +220,35 @@ export const RawInlineExtension = Mark.create({
           return rawAttrs ? ` ${rawAttrs}` : '';
         },
       },
+      isComment: {
+        default: false,
+        parseHTML: (element) => element.getAttribute('data-raw-comment') === 'true',
+      },
     };
   },
 
   parseHTML() {
-    return [{ tag: 'span' }, { tag: 'kbd' }, { tag: 'b' }, { tag: 'code' }];
+    return [
+      { tag: 'span[data-raw-comment]' },
+      { tag: 'span' },
+      { tag: 'kbd' },
+      { tag: 'b' },
+      { tag: 'code' },
+    ];
   },
 
   renderHTML({ HTMLAttributes }) {
+    if (HTMLAttributes['data-raw-comment'] === 'true' || HTMLAttributes.isComment) {
+      return ['span', { 'data-raw-inline': '', 'data-raw-comment': 'true', ...HTMLAttributes }, 0];
+    }
     const tag = (HTMLAttributes.tag as string) || 'span';
     return [tag, { 'data-raw-inline': '', ...HTMLAttributes }, 0];
   },
 
   renderMarkdown(node, h) {
+    if (node.attrs?.isComment) {
+      return h.renderChildren(node);
+    }
     const tag = node.attrs?.tag || 'span';
     const attrs = node.attrs?.attrs || '';
     const content = h.renderChildren(node);

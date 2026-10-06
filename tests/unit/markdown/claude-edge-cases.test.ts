@@ -146,12 +146,13 @@ describe('Task 2.4: Claude 48-Case Review Regression Test Suite', () => {
       const serialized = serialize(result.doc);
       expect(serialized).not.toContain('&lt;br&gt;');
       expect(serialized).not.toContain('&lt;br/&gt;');
-      // CommonMark allows either <br> or 2-space line breaks
-      expect(serialized).toMatch(/Dòng 1(?:<br>| {2}\n)Dòng 2(?:<br\/?>| {2}\n)Dòng 3/);
+      // CommonMark / WriteFlow Plan 9.3 allows <br>, 2 spaces, or backslash line breaks
+      expect(serialized).toMatch(/Dòng 1(?:<br>| {2}\n|\\\n)Dòng 2(?:<br\/?>| {2}\n|\\\n)Dòng 3/);
     });
 
     it('preserves <span> with attributes and <code> in HTML form', () => {
-      const input = 'Xem trạng thái <span class="badge">Đã duyệt</span> và <code>npm run test</code>.\n';
+      const input =
+        'Xem trạng thái <span class="badge">Đã duyệt</span> và <code>npm run test</code>.\n';
       const result = parse(input);
 
       const serialized = serialize(result.doc);
