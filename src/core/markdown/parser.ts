@@ -1,7 +1,7 @@
 import { MarkdownManager } from '@tiptap/markdown';
 import { getSchema } from '@tiptap/core';
 import type { Schema } from '@tiptap/pm/model';
-import { CustomStarterKit } from '../editor/extensions';
+import { createMarkdownEngineExtensions } from './extensions';
 import type {
   FrontmatterData,
   MarkdownOptions,
@@ -25,7 +25,7 @@ let sharedSchema: Schema | null = null;
 export function getSharedMarkdownManager(): MarkdownManager {
   if (!sharedManager) {
     sharedManager = new MarkdownManager({
-      extensions: [CustomStarterKit],
+      extensions: createMarkdownEngineExtensions(),
       indentation: {
         style: 'space',
         size: 2,
@@ -37,7 +37,7 @@ export function getSharedMarkdownManager(): MarkdownManager {
 
 export function getSharedMarkdownSchema(): Schema {
   if (!sharedSchema) {
-    sharedSchema = getSchema([CustomStarterKit]);
+    sharedSchema = getSchema(createMarkdownEngineExtensions());
   }
   return sharedSchema;
 }
