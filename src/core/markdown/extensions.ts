@@ -2,6 +2,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Link } from '@tiptap/extension-link';
 import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
+import { RawBlockExtension } from '../editor/extensions/raw-block';
 import type { AnyExtension } from '@tiptap/core';
 
 /**
@@ -14,6 +15,7 @@ import type { AnyExtension } from '@tiptap/core';
  * - Horizontal rules (---)
  * - Headings H1-H6
  * - Inline marks: Bold (**), Italic (*), Strike (~~), Inline Code (`), Links ([text](url))
+ * - Raw HTML and unsupported blocks (RawBlockExtension - Plan 9.2)
  */
 export function createMarkdownEngineExtensions(): AnyExtension[] {
   return [
@@ -35,5 +37,6 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     TaskItem.configure({
       nested: true,
     }),
+    RawBlockExtension,
   ];
 }

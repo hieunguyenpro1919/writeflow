@@ -77,3 +77,33 @@
   border-top: 1px solid var(--editor-border-color);
   margin: 2em 0;
 }
+
+/* RawBlock container (Plan 9.2: Raw block for unparsed HTML/custom syntax) */
+.tiptap.ProseMirror .raw-block-container {
+  border: 1px dashed var(--editor-border-color);
+  border-radius: var(--editor-radius-md);
+  background-color: var(--editor-bg-code);
+  padding: 12px 16px;
+  margin: 1.25em 0;
+}
+
+.tiptap.ProseMirror .raw-block-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--editor-text-secondary);
+  margin-bottom: 8px;
+  user-select: none;
+  opacity: 0.85;
+}
+
+.tiptap.ProseMirror .raw-block-content {
+  margin: 0;
+  padding: 0;
+  font-family: var(--editor-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--editor-text-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+}
