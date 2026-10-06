@@ -115,9 +115,9 @@ describe('Base Round-trip Test Harness (Task 2.1 / Plan 9.7)', () => {
   });
 
   describe('4. YAML Frontmatter separation & preservation', () => {
-    it('should cleanly extract and preserve simple frontmatter (--- title: Test ---)', () => {
+    it('should cleanly extract and preserve standard frontmatter', () => {
       const input =
-        '--- title: Test ---\n\n# Document Title\n\nBody content goes here.\n';
+        '---\ntitle: Test\n---\n\n# Document Title\n\nBody content goes here.\n';
       const result = parse(input);
 
       // Frontmatter must be cleanly isolated

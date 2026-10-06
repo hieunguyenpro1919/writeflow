@@ -11,6 +11,31 @@ function isProseMirrorNode(doc: JSONContent | ProsemirrorNode): doc is Prosemirr
 }
 
 /**
+ * Normalizes serialized markdown output to prevent over-escaping and data loss:
+ * 1. Restores HTML entities (&amp;copy; -> &copy;)
+ * 2. Restores inline HTML tags (&lt;kbd&gt; -> <kbd>, &lt;/kbd&gt; -> </kbd>, <br>, <b>, <span>, <code>)
+ * 3. Restores inline footnote references (\[^1\] -> [^1])
+ * 4. Restores footnote definitions and link reference definitions (\[^1\]: -> [^1]:, \[ref\]: -> [ref]:)
+ */
+export function normalizeSerializedMarkdown(markdown: string): string {
+  let result = markdown;
+
+  // 1. Restore HTML entities (&amp;copy; -> &copy;, &#169;, &mdash;, etc.)
+  result = result.replace(/&amp;([a-zA-Z0-9#]+;)/g, '&$1');
+
+  // 2. Restore inline HTML tags (&lt;kbd&gt; -> <kbd>, &lt;/kbd&gt; -> </kbd>, <br>, etc.)
+  result = result.replace(/&lt;(\/?(?:[a-zA-Z][\w-]*)(?:\s+[^<>]*?)?\/?)&gt;/g, '<$1>');
+
+  // 3. Restore footnote references (\[^1\] -> [^1])
+  result = result.replace(/\\\[\^([^\s\]]+)\\\]/g, (_m, id) => `[^${id}]`);
+
+  // 4. Restore reference definitions and footnote definitions (\[^1\]: -> [^1]:, \[ref\]: -> [ref]:)
+  result = result.replace(/^\\\[(\^?[^\]]+)\\\]:/gm, (_m, id) => `[${id}]:`);
+
+  return result;
+}
+
+/**
  * Serializes a document representation (JSONContent or ProseMirror Node) into standardized Markdown.
  * Prepend frontmatter header if provided, ensuring zero data loss (Plan 9.1 & 9.2).
  */
@@ -23,7 +48,8 @@ export function serialize(
   const manager = getSharedMarkdownManager();
 
   // 1. Serialize document body
-  const bodyMarkdown = manager.serialize(jsonContent);
+  let bodyMarkdown = manager.serialize(jsonContent);
+  bodyMarkdown = normalizeSerializedMarkdown(bodyMarkdown);
 
   // 2. Format frontmatter header if present
   let header = '';

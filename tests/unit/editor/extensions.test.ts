@@ -3,8 +3,8 @@ import { Editor } from '@tiptap/core';
 import { createExtensions } from '../../../src/core/editor/extensions';
 import { createWelcomeContent } from '../../../src/core/editor/use-app-editor';
 
-describe('Task 1.3: Editor Configuration & Schema Guard', () => {
-  it('creates an editor without forbidden marks (underline, link)', () => {
+describe('Task 1.3 & 2.4: Editor Configuration & Synchronized Schema Guard', () => {
+  it('creates an editor without forbidden marks (underline) and with synchronized Phase 2 marks', () => {
     const editor = new Editor({
       extensions: createExtensions(),
       content: { type: 'doc', content: [{ type: 'paragraph' }] },
@@ -12,34 +12,40 @@ describe('Task 1.3: Editor Configuration & Schema Guard', () => {
 
     const marks = Object.keys(editor.schema.marks);
     expect(marks).not.toContain('underline');
-    expect(marks).not.toContain('link');
 
-    // Expected Phase 1 marks
+    // Expected Phase 2 synchronized marks
     expect(marks).toContain('bold');
     expect(marks).toContain('italic');
     expect(marks).toContain('strike');
     expect(marks).toContain('code');
+    expect(marks).toContain('link');
+    expect(marks).toContain('rawInline');
 
     editor.destroy();
   });
 
-  it('creates an editor without forbidden nodes (codeBlock, horizontalRule, trailingNode)', () => {
+  it('creates an editor without forbidden nodes (trailingNode) and with synchronized Phase 2 nodes', () => {
     const editor = new Editor({
       extensions: createExtensions(),
       content: { type: 'doc', content: [{ type: 'paragraph' }] },
     });
 
     const nodes = Object.keys(editor.schema.nodes);
-    expect(nodes).not.toContain('codeBlock');
-    expect(nodes).not.toContain('horizontalRule');
+    expect(nodes).not.toContain('trailingNode');
 
-    // Expected Phase 1 nodes
+    // Expected Phase 2 synchronized nodes
     expect(nodes).toContain('paragraph');
     expect(nodes).toContain('heading');
     expect(nodes).toContain('blockquote');
     expect(nodes).toContain('bulletList');
     expect(nodes).toContain('orderedList');
     expect(nodes).toContain('listItem');
+    expect(nodes).toContain('taskList');
+    expect(nodes).toContain('taskItem');
+    expect(nodes).toContain('codeBlock');
+    expect(nodes).toContain('horizontalRule');
+    expect(nodes).toContain('image');
+    expect(nodes).toContain('rawBlock');
     expect(nodes).toContain('hardBreak');
     expect(nodes).toContain('doc');
     expect(nodes).toContain('text');
