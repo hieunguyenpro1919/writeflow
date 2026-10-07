@@ -8,6 +8,7 @@ import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import type { AnyExtension } from '@tiptap/core';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Blockquote from '@tiptap/extension-blockquote';
 import {
   RawBlockExtension,
   RawTableExtension,
@@ -99,6 +100,28 @@ export const CustomHorizontalRule = HorizontalRule.extend({
       return '\n---';
     }
     return '---';
+  },
+});
+
+/**
+ * Custom Blockquote that serializes blockquotes with only empty paragraphs to empty string (TD-07).
+ */
+export const CustomBlockquote = Blockquote.extend({
+  renderMarkdown(node, h, ctx) {
+    if (!node.content || !Array.isArray(node.content) || node.content.length === 0) {
+      return '';
+    }
+    const hasMeaningfulContent = node.content.some((child) => {
+      if (child.type === 'paragraph') {
+        const c = Array.isArray(child.content) ? child.content : [];
+        return c.length > 0;
+      }
+      return true;
+    });
+    if (!hasMeaningfulContent) {
+      return '';
+    }
+    return (Blockquote.config.renderMarkdown as any)?.call(this, node, h, ctx) ?? '';
   },
 });
 
@@ -299,10 +322,12 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
       trailingNode: false,
       hardBreak: false,
       paragraph: false,
+      blockquote: false,
     }),
     CustomParagraph,
     CustomHardBreak,
     CustomHorizontalRule,
+    CustomBlockquote,
     CustomLink.configure({
       openOnClick: false,
     }),

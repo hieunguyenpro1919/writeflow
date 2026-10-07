@@ -71,7 +71,7 @@ describe('TASK 2.4c — Dứt điểm lỗi serializer (Phase 2)', () => {
         ],
       };
       const output = serialize(json);
-      expect(output).toBe('>\n');
+      expect(output).toBe('');
     });
 
     it('A5: taskList > taskItem(checked:false) > empty paragraph', () => {

@@ -27,6 +27,11 @@ export function normalizeSerializedMarkdown(markdown: string): string {
   // 3. Keep opening bracket escaped for reference definitions at line-start: \[ref\]: -> \[ref]: (Task 2.4c Group D)
   result = result.replace(/^\\\[([^\]]+)\\\]:/gm, (_m, id) => `\\[${id}]:`);
 
+  // 4. Restore bare URLs (TD-05): do not escape _, *, ~ or & in bare URLs (http://, https://, www.)
+  result = result.replace(/(?:https?:\/\/|www\.)[^\s<>]+/g, (url) => {
+    return url.replace(/\\([_*~])/g, '$1').replace(/&amp;/g, '&');
+  });
+
   return result;
 }
 

@@ -15,9 +15,9 @@
 | **TD-02** | Bắt sự kiện IME qua tham chiếu toàn cục `window.event` trong `SmartKeysExtension` | Phase 1 (Task 1.9) | Trung bình | Phase 3 | Mở (Open) |
 | **TD-03** | Khoảng trắng 1–3 hoặc tab đầu dòng trước ký hiệu mở lại thành block | Task 2.4c Mục 4 | Thấp | Chấp nhận có điều kiện | Chấp nhận có điều kiện, ủy quyền ngày 07/10/2026. (Hết hiệu lực nếu corpus Task 2.5b báo lỗi mất dữ liệu trên file thật) |
 | **TD-04** | Văn bản gõ entity số `&#35;`, `&#..;` mở lại bị giải mã | Task 2.4c Mục 4 | Thấp | Chấp nhận có điều kiện | Chấp nhận có điều kiện, ủy quyền ngày 07/10/2026. (Hết hiệu lực nếu corpus Task 2.5b báo lỗi) |
-| **TD-05** | URL trần có `_` bị escape thành `\_` hiển thị dấu `\` | Task 2.4c Mục 4 | Thấp | Đang sửa (Task 2.5a) | Đang sửa (Task 2.5a) |
+| **TD-05** | URL trần có `_` bị escape thành `\_` hiển thị dấu `\` | Task 2.4c Mục 4 | Thấp | Đã sửa (Task 2.5a) | Đã sửa (Task 2.5a) |
 | **TD-06** | Các dị biệt inline: tiêu đề kết thúc ` #`, code span dời cách, `<img />`, Setext đa dòng | Task 2.4c Mục 4 | Thấp | Chấp nhận có điều kiện | Chấp nhận có điều kiện, ủy quyền ngày 07/10/2026. (Hết hiệu lực nếu corpus Task 2.5b báo lỗi) |
-| **TD-07** | Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2 | Task 2.4c Ma trận 3b | Thấp | Đang sửa (Task 2.5a) | Đang sửa (Task 2.5a) |
+| **TD-07** | Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2 | Task 2.4c Ma trận 3b | Thấp | Đã sửa (Task 2.5a) | Đã sửa (Task 2.5a) |
 | **TD-08** | Task item chứa block non-text bị marked parse thành bullet text `[ ]` | Task 2.4c Ma trận 3b | Trung bình | Hoãn đến Phase 6 | Hoãn đến Phase 6. Điều kiện cứng: phải sửa xong trước khi bật nút Task list trong UI |
 | **TD-09** | HorizontalRule ở vị trí only/first trong list item không có đoạn văn neo | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
 | **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
@@ -52,6 +52,7 @@
   - JSON Content: `{ type: 'paragraph', content: [{ type: 'text', text: 'http://example.com/x_y' }] }`
 - **Hành vi hiện tại:** Tiptap markdown serializer tự động escape dấu gạch dưới trong từ thành `http://example.com/x\_y`. Khi parse lại thành link, text hiển thị chứa dấu gạch chéo ngược `\`.
 - **Hành vi mong muốn:** URL trần hoặc link URL không được escape ký tự `_` bên trong URI.
+- **Trạng thái:** Đã sửa trong Task 2.5a (Serializer tự động phục hồi `_`, `*`, `~`, `&` trong URL trần bắt đầu bằng `http://`, `https://`, `www.`).
 
 ### TD-06: Các dị biệt inline: tiêu đề kết thúc ` #`, code span dời cách, `<img />`, Setext đa dòng
 - **Chuỗi/JSON tái hiện:**
@@ -65,9 +66,10 @@
 ### TD-07: Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2
 - **Chuỗi/JSON tái hiện:**
   - JSON Content: `{ type: 'doc', content: [{ type: 'blockquote', content: [{ type: 'paragraph' }] }] }`
-  - Đầu ra serialize lần 1: `">\n"`
-- **Hành vi hiện tại:** Serialize ra `">\n"`. Marked parse chuỗi này thành `{ type: 'blockquote', content: [] }` (blockquote không có content). Khi serialize lần 2, do content rỗng nên serializer xuất ra `""`, làm mất blockquote.
-- **Hành vi mong muốn:** Khi parse `">\n"`, parser tái tạo một empty paragraph bên trong blockquote để bảo đảm tính idempotent.
+  - Đầu ra serialize: `""` (chuỗi rỗng)
+- **Hành vi hiện tại:** Ban đầu serialize ra `">\n"`, marked parse thành `{ type: 'blockquote', content: [] }`, serialize lần 2 thành `""` (không idempotent).
+- **Hành vi mong muốn:** `blockquote` chỉ chứa các đoạn văn trống được serialize thành chuỗi rỗng `""` ngay từ lần đầu (lần lưu 1 == lần lưu 2).
+- **Trạng thái:** Đã sửa trong Task 2.5a (`CustomBlockquote` trả về chuỗi rỗng khi chỉ chứa các empty paragraph, đảm bảo tính idempotent tuyệt đối).
 
 ### TD-08: Task item chứa block non-text bị marked parse thành bullet text `[ ]`
 - **Chuỗi/JSON tái hiện:**

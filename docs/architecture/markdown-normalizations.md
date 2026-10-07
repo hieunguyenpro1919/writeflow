@@ -61,12 +61,13 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - Khối mã dùng dấu ngã `~~~` hoặc khối mã thụt 4 khoảng trắng (indented code block) được chuẩn hóa thành fenced code block bằng dấu huyền ```` ``` ```` với số lượng backtick động tương ứng nội dung.
 - **Lazy Blockquotes**:
   - Các dòng lazy blockquote thiếu ký tự `>` ở các dòng kế tiếp sẽ được thêm tiền tố `>` đồng nhất ở đầu mỗi dòng trích dẫn.
-- **Trích dẫn chỉ chứa đoạn trống**:
-  - Đang xử lý trong Task 2.5a. (Sẽ cập nhật: blockquote > paragraph rỗng được ghi thành chuỗi rỗng).
+- **Trích dẫn chỉ chứa đoạn trống (Task 2.5a - TD-07)**:
+  - Khối trích dẫn (`blockquote`) chỉ chứa các đoạn văn trống (kể cả nhiều đoạn trống liên tiếp) được ghi thành chuỗi rỗng `""` ngay từ lần đầu (lần lưu 1 == lần lưu 2), đảm bảo tính idempotent tuyệt đối.
 
 ## 6. Định dạng nội dòng (Inline Formatting)
 - **Italic**: `_italic_` được chuẩn hóa thành `*italic*` theo chuẩn canonical của CommonMark serializer.
 - **Snake Case Escaping**: Ký tự gạch dưới giữa từ như `snake_case` được tự động escape thành `snake\_case` để tránh nhầm lẫn với cú pháp nhấn mạnh in nghiêng của markdown lexer.
+- **Bảo toàn ký tự trong URL trần (Task 2.5a - TD-05)**: Trong văn bản không có mark link, chuỗi bắt đầu bằng `http://`, `https://` hoặc `www.` (kéo dài đến khoảng trắng hoặc ký tự `<`, `>`) thì KHÔNG escape `_`, `*`, `~`, `&` bên trong chuỗi đó. Ngoài chuỗi URL, cơ chế escape `\_` vẫn được giữ nguyên vẹn.
 
 ## 7. Ký tự thoát & Ngắt dòng (Escaping & Line Breaks)
 - **Ngắt dòng cứng (Hard Line Break - Plan 9.3 & Task 2.4c Nhóm B)**:

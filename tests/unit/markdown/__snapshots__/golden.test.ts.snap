@@ -530,10 +530,7 @@ exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8
 "
 `;
 
-exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 4: blockquote empty paragraph 1`] = `
-">
-"
-`;
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 4: blockquote empty paragraph 1`] = `""`;
 
 exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 5: taskList empty paragraph 1`] = `
 "- [ ]

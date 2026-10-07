@@ -189,8 +189,8 @@ describe('Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad
     });
 
     it('golden 4: blockquote empty paragraph', () => {
-      // Golden output from 3ad8344: ">\n"
-      const goldenOutput = '>\n';
+      // Output updated to empty string per Task 2.5a (TD-07)
+      const goldenOutput = '';
       expect(goldenOutput).toMatchSnapshot();
     });
 
