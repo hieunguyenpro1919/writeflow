@@ -30,13 +30,13 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 - **Chuẩn hóa ký tự**:
   - Các biến thể như `***`, `___`, hoặc `* * *` khi xuất ra sẽ được chuẩn hóa thành `---` đứng riêng dòng có dòng trống cách ly.
 - **Dòng trống phân cách trong khối chứa (Task 2.4c Nhóm C)**:
-  - Khi một đường kẻ ngang (`---`) nằm ngay sau một đoạn văn trong khối danh sách (`listItem`), Serializer chèn thêm một dòng trống (`\n---`) để tạo cấu trúc:
+  - Khi một đường kẻ ngang (`---`) nằm ngay sau một đoạn văn trong khối danh sách (`listItem`), Serializer chèn thêm một dòng trống (`\n  \n  ---`) để tạo cấu trúc:
     ```markdown
     - Đoạn văn
-
+      
       ---
     ```
-  - Lý do: Theo chuẩn CommonMark, nếu không có dòng trống ngăn cách, dòng `- a\n  ---` sẽ bị phân tích nhầm thành tiêu đề Setext level 2 thay vì một đoạn văn và một đường kẻ ngang.
+  - Lý do: Dòng trống này chứa hai dấu cách thụt lề. Mặc dù linter có thể tự động xóa hai dấu cách này, nội dung vẫn hoàn toàn đúng ngữ nghĩa theo CommonMark.
 
 ## 4. Liên kết & Đường dẫn (Links)
 - **Reference-style Links -> Inline Links**:
@@ -51,12 +51,18 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
     ```
 - **Autolinks & Bare URLs**:
   - Dạng `<https://example.com>` hoặc bare URL `https://example.com` được chuẩn hóa thành `[https://example.com](https://example.com)`.
+- **URL trần trong văn bản (Sau Task 2.5a)**:
+  - Dấu `_` và `*` trong chuỗi bắt đầu bằng `http://`, `https://` hoặc `www.` không bị escape.
+  - Vào: `http://a.com/x_y`
+  - Ra: `http://a.com/x_y`. Khi mở lại, trình phân tích tự nhận là liên kết (autolink GFM). Nội dung chữ không đổi nhưng được gắn mark liên kết (Hành vi chuẩn GFM).
 
 ## 5. Khối mã (Code Blocks) & Khối trích dẫn (Blockquotes)
 - **Fenced Code Blocks**:
   - Khối mã dùng dấu ngã `~~~` hoặc khối mã thụt 4 khoảng trắng (indented code block) được chuẩn hóa thành fenced code block bằng dấu huyền ```` ``` ```` với số lượng backtick động tương ứng nội dung.
 - **Lazy Blockquotes**:
   - Các dòng lazy blockquote thiếu ký tự `>` ở các dòng kế tiếp sẽ được thêm tiền tố `>` đồng nhất ở đầu mỗi dòng trích dẫn.
+- **Trích dẫn chỉ chứa đoạn trống**:
+  - Đang xử lý trong Task 2.5a. (Sẽ cập nhật: blockquote > paragraph rỗng được ghi thành chuỗi rỗng).
 
 ## 6. Định dạng nội dòng (Inline Formatting)
 - **Italic**: `_italic_` được chuẩn hóa thành `*italic*` theo chuẩn canonical của CommonMark serializer.
@@ -66,7 +72,9 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 - **Ngắt dòng cứng (Hard Line Break - Plan 9.3 & Task 2.4c Nhóm B)**:
   - Thẻ `<br>` hoặc 2 khoảng trắng cuối dòng được chuẩn hóa thành dấu gạch chéo ngược `\` ở cuối dòng (`\\\n`), loại bỏ rủi ro bị các công cụ format/linter tự động xóa bỏ trailing spaces.
   - Xóa khoảng trắng thừa (trailing spaces) vô nghĩa ở cuối các dòng văn bản thông thường.
-  - **Bỏ ngắt dòng cứng ở cuối khối (Task 2.4c Nhóm B)**: Khi một hoặc nhiều `hardBreak` nằm ở vị trí kết thúc của một khối đoạn văn (`paragraph`), các ngắt dòng cứng này sẽ được tự động lược bỏ thay vì xuất ra `\\\n\n`, nhằm tránh tạo các dòng trống giả hoặc vi phạm định dạng CommonMark ở ranh giới khối (ví dụ `[text, hardBreak]` trong listItem chuyển thành `- text\n`).
+  - **Bỏ ngắt dòng cứng ở cuối khối (Task 2.4c Nhóm B)**: Khi lưu, ngắt dòng cứng ở cuối khối bị bỏ. 
+    + Vào: `a` rồi ngắt dòng.
+    + Ra: `a\n`.
 - **Ký tự thoát không cần thiết**: Các ký tự `\#`, `\.`, `\|` khi không nằm trong ngữ cảnh xung đột cú pháp sẽ được bỏ dấu `\` để văn bản tự nhiên.
 - **Thoát ký tự đầu dòng đoạn văn (Line-Start Syntax Escaping - Plan 9.5 P0 & Task 2.4c Nhóm D)**:
   - Để ngăn chặn việc văn bản thuần bị biến thành cấu trúc khối (Block Structures) khi mở lại (Round-trip), Serializer tự động thêm dấu thoát `\` khi dòng bắt đầu bằng các cú pháp đặc thù (theo sau bởi khoảng trắng hoặc kết thúc dòng):
@@ -77,7 +85,16 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
     + Định nghĩa tham chiếu dạng văn bản thuần: `^(\[[^\]]+\]:)` (ví dụ `[ref]: http://x`) -> `\[ref]: http://x` (bảo toàn dấu thoát ngoặc vuông mở để không bị parse nhầm thành reference definition)
     + Horizontal Rule: `---` -> `\---`
     + Blockquote: `> ` -> `\> `
-    + Indented Code: 4 khoảng trắng đầu dòng `    ` -> `&#32;   ` (ngăn indented code block và phục hồi 4 dấu cách khi parse)
+    + Indented Code: 4 khoảng trắng đầu dòng `    ` -> `&#32;   `
     + Fenced Code: ```` ``` ```` hoặc `~~~` -> `\``` ` hoặc `\~~~`
-    + Plain Text Tags: `<tag>`, `<b>`, `<a>` -> `\<tag>`, `\<b`, `\<a` (ngăn nhận diện nhầm thành rawBlock / rawInline)
-    + HTML Entities: `&amp;`, `&lt;`, `&copy;` -> serialize dưới dạng escaped entities (`&amp;amp;`, `&amp;lt;`, `\&copy;`) để phục hồi 100% văn bản người dùng gõ.
+    + Plain Text Tags: `<tag>`, `<b>`, `<a>` -> `\<tag>`, `\<b`, `\<a`
+    + HTML Entities: `&amp;`, `&lt;`, `&copy;` -> serialize dưới dạng escaped entities (`&amp;amp;`, `&amp;lt;`, `\&copy;`).
+    + Dòng bắt đầu bằng `[tên]:` trong văn bản thường được escape dấu `[` (`\[ref]: ...`).
+
+## 8. Xử lý Đoạn Trống (Empty Paragraphs)
+- Một đoạn trống giữa hai đoạn ra đúng một dòng trống kép.
+  + Vào: đoạn `a`, đoạn trống, đoạn `b`.
+  + Ra: `a\n\n\n\nb\n`.
+- Từ đoạn trống thứ hai trở đi (liên tiếp) được ghi thành `&nbsp;` trên dòng riêng và mở lại thành đoạn trống.
+- Đoạn trống ở **đầu file** ra dòng trống đầu file.
+- Đoạn trống ở **cuối file** (một đoạn) bị bỏ. Từ hai đoạn trở lên thì đoạn cuối còn lại dạng `&nbsp;`.
