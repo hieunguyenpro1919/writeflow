@@ -70,6 +70,7 @@
 - **Hành vi hiện tại:** Ban đầu serialize ra `">\n"`, marked parse thành `{ type: 'blockquote', content: [] }`, serialize lần 2 thành `""` (không idempotent).
 - **Hành vi mong muốn:** `blockquote` chỉ chứa các đoạn văn trống được serialize thành chuỗi rỗng `""` ngay từ lần đầu (lần lưu 1 == lần lưu 2).
 - **Trạng thái:** Đã sửa trong Task 2.5a (`CustomBlockquote` trả về chuỗi rỗng khi chỉ chứa các empty paragraph, đảm bảo tính idempotent tuyệt đối).
+- **Ghi chú (Task 2.5a-fix):** Blockquote lồng nhau chỉ chứa các đoạn trống (ví dụ `> >`) hiện chưa idempotent và sẽ được xử lý ở phase sau.
 
 ### TD-08: Task item chứa block non-text bị marked parse thành bullet text `[ ]`
 - **Chuỗi/JSON tái hiện:**

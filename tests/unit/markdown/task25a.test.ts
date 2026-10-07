@@ -159,4 +159,44 @@ describe('Task 2.5a: TD-05 & TD-07 Fixes', () => {
       expect(sameTree(parsed.doc, doc)).toBe(true);
     });
   });
+
+  // =========================================================================
+  // Task 2.5a-fix Mục 3.3.A: Phải GIỮ NGUYÊN (đầu ra bằng đầu vào, byte-for-byte)
+  // =========================================================================
+  describe('Task 2.5a-fix 3.3.A: Preserves verbatim in codeBlocks, inline code, and raw HTML', () => {
+    it('A1: Fenced Code Block preserves URLs with \\_ and &amp; exactly byte-for-byte', () => {
+      const input = '```\ncurl https://api.x.com/a\\_b?x=1&amp;y=2\n```\n';
+      const parsed = parse(input);
+      const output = serialize(parsed.doc);
+      expect(output).toBe(input);
+    });
+
+    it('A2: Fenced Code Block with language md preserves URLs with \\_ and \\* exactly byte-for-byte', () => {
+      const input = '```md\nSee http://a.com/x\\_y and www.foo.org/a\\*b\n```\n';
+      const parsed = parse(input);
+      const output = serialize(parsed.doc);
+      expect(output).toBe(input);
+    });
+
+    it('A3: Inline code span preserves URL with \\_ literally without unescaping', () => {
+      const input = 'Use `http://a.com/x\\_y` literally\n';
+      const parsed = parse(input);
+      const output = serialize(parsed.doc);
+      expect(output).toBe(input);
+    });
+
+    it('A4: Raw HTML block preserves &amp; in href byte-for-byte', () => {
+      const input = '<div>\n<a href="https://x.com/?a=1&amp;b=2">l</a>\n</div>\n';
+      const parsed = parse(input);
+      const output = serialize(parsed.doc);
+      expect(output).toBe(input);
+    });
+
+    it('A5: Raw inline HTML (<a ... target>) preserves &amp; in URL attributes', () => {
+      const input = '<a href="https://x.com/?a=1&amp;b=2" target="_blank">link</a>\n';
+      const parsed = parse(input);
+      const output = serialize(parsed.doc);
+      expect(output).toBe(input);
+    });
+  });
 });

@@ -50,8 +50,27 @@ export function escapeParagraphLineStarts(content: string): string {
 }
 
 /**
+ * Unescapes special characters (_, *, ~, &) in bare URLs (http://, https://, www.)
+ * within plain text portions of a paragraph (TD-05).
+ * Protects inline code spans `...`, HTML comments <!--...-->, HTML tags <...>,
+ * and markdown links [...](...) so they remain completely unaltered byte-for-byte.
+ */
+export function unescapeBareUrlsInParagraph(content: string): string {
+  return content.replace(
+    /(`+[\s\S]*?`+|<!--[\s\S]*?-->|<[^>]+>|\[[^\]]*\]\([^)]*\))|((?:https?:\/\/|www\.)[^\s<>]+)/g,
+    (_match, protectedToken, bareUrl) => {
+      if (protectedToken) {
+        return protectedToken;
+      }
+      return bareUrl.replace(/\\([_*~])/g, '$1').replace(/&amp;/g, '&');
+    },
+  );
+}
+
+/**
  * Custom Paragraph extension that avoids infinite recursion on empty content (Task 2.4c Group A),
  * trims trailing hardBreaks at block boundaries (Task 2.4c Group B),
+ * restores unescaped characters in bare URLs (Task 2.5a TD-05),
  * and automatically escapes syntax at line starts (Plan 9.5 P0).
  */
 export const CustomParagraph = Paragraph.extend({
@@ -77,7 +96,7 @@ export const CustomParagraph = Paragraph.extend({
     }
 
     const raw = h.renderChildren(trimmed);
-    return escapeParagraphLineStarts(raw);
+    return escapeParagraphLineStarts(unescapeBareUrlsInParagraph(raw));
   },
 });
 
@@ -121,7 +140,7 @@ export const CustomBlockquote = Blockquote.extend({
     if (!hasMeaningfulContent) {
       return '';
     }
-    return (Blockquote.config.renderMarkdown as any)?.call(this, node, h, ctx) ?? '';
+    return this.parent?.(node, h, ctx) ?? '';
   },
 });
 
@@ -201,7 +220,8 @@ export const CustomLink = Link.extend({
 
     // If extended attributes are present, output verbatim raw HTML <a> tag
     if (target || rel || className || style || id) {
-      const parts = [`href="${rawHref}"`];
+      const safeHref = rawHref.replace(/&/g, '&amp;');
+      const parts = [`href="${safeHref}"`];
       if (target) parts.push(`target="${target}"`);
       if (rel) parts.push(`rel="${rel}"`);
       if (title) parts.push(`title="${title}"`);
