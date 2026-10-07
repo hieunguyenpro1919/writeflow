@@ -1,0 +1,550 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: advanced-inline.md 1`] = `
+"This paragraph demonstrates ~~strikethrough text~~ clearly.
+
+Here is a simple [WriteFlow Link](https://writeflow.app) for testing.
+
+We can also nest formatting inside links: [**Bold Link Text**](https://example.com/bold) and [*Italic Link Text*](https://example.com/italic) and [~~Strikethrough Link~~](https://example.com/strike).
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: blockquotes-nested.md 1`] = `
+"> Level 1 outer quote
+>
+> > Level 2 nested quote
+> >
+> > > Level 3 deeply nested quote
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: code-blocks.md 1`] = `
+"\`\`\`typescript
+function calculateFactorial(n: number): number {
+  if (n <= 1) return 1;
+  return n * calculateFactorial(n - 1);
+}
+\`\`\`
+
+\`\`\`python
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+\`\`\`
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: frontmatter.md 1`] = `
+"---
+title: Test
+---
+
+# Document with Frontmatter
+
+This document contains a valid YAML frontmatter header.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: headings.md 1`] = `
+"# Heading 1
+
+## Heading 2
+
+### Heading 3
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: inline-formatting.md 1`] = `
+"Here is **bold text**, *italic text*, and \`inline code\`.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: lists-nested.md 1`] = `
+"- Level 1 Bullet Item
+  - Level 2 Nested Item A
+  - Level 2 Nested Item B
+    - Level 3 Deep Item
+- Level 1 Bullet Item 2
+
+1. First Ordered Item
+   1. Nested Ordered Sub-item 1
+   2. Nested Ordered Sub-item 2
+2. Second Ordered Item
+
+- [ ] Uncompleted Task Item
+- [x] Completed Task Item
+  - [ ] Nested Task Item A
+  - [x] Nested Task Item B
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: paragraph.md 1`] = `
+"This is a standard plain text paragraph in WriteFlow.
+
+This is a second paragraph separated by a blank line.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 1. Fixture Files Baseline > snapshots fixture: raw-html-and-custom.md 1`] = `
+"# Document With Raw HTML And Custom Blocks
+
+This is standard markdown text preceding raw blocks.
+
+<div class="custom-container" data-test="container">
+  <h3>Raw HTML Container</h3>
+  <p>Inner content within raw HTML block</p>
+</div>
+
+<details>
+  <summary>Click to expand</summary>
+  <p>Hidden spoiler text inside details tag</p>
+</details>
+
+<!-- This is an HTML comment preserved without modification -->
+
+<img src="https://example.com/standalone-asset.png" alt="Self-closing raw image" />
+
+<style>
+  .custom-highlight { background-color: yellow; }
+</style>
+
+Concluding paragraph in standard markdown.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "#1 priority" 1`] = `
+"#1 priority
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "#hashtag" 1`] = `
+"#hashtag
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "&amp; &lt;" 1`] = `
+"&amp;amp; &amp;lt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "***" 1`] = `
+"\\*\\*\\*
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "+84 912" 1`] = `
+"+84 912
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "<tag>" 1`] = `
+"\\<tag&gt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "> quote" 1`] = `
+"&gt; quote
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "[x](y)" 1`] = `
+"\\[x\\](y)
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "---" 1`] = `
+"\\---
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "-5 độ" 1`] = `
+"-5 độ
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "1.5 kg" 1`] = `
+"1.5 kg
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "1986. year" 1`] = `
+"1986\\. year
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "2026-10-06" 1`] = `
+"2026-10-06
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "C#" 1`] = `
+"C#
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "Việt # Nam" 1`] = `
+"Việt # Nam
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "a *star* b" 1`] = `
+"a \\*star\\* b
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "a - b" 1`] = `
+"a - b
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 2. Khong Duoc Doi Strings Baseline > snapshots untouched text string: "a_b_c" 1`] = `
+"a\\_b\\_c
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "![Architecture Diagram](https:..." 1`] = `
+"![Architecture Diagram](https://example.com/arch.svg "System Overview")
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "![WriteFlow Banner](https://ex..." 1`] = `
+"![WriteFlow Banner](https://example.com/banner.png)
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "# Document with Tables\\n\\nParagr..." 1`] = `
+"# Document with Tables
+
+Paragraph before first table.
+
+| T1 Col 1 | T1 Col 2 |
+| --- | --- |
+| Data 1 | Data 2 |
+
+Paragraph between tables.
+
+| T2 Col A | T2 Col B |
+| --- | --- |
+| Alpha | Beta |
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "<!-- Standalone block comment ..." 1`] = `
+"<!-- Standalone block comment -->
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "[Tài liệu](<tập tin 2.pdf> "Ti..." 1`] = `
+"[Tài liệu](<tập tin 2.pdf> "Tiêu đề tài liệu")
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "[Tài liệu](<tập tin có khoảng ..." 1`] = `
+"[Tài liệu](<tập tin có khoảng trắng.pdf>)
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "\`\`\`\`\`markdown\\n\`\`\`\`markdown\\ncod..." 1`] = `
+"\`\`\`\`\`markdown
+\`\`\`\`markdown
+code
+\`\`\`\`
+\`\`\`\`\`
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "\`\`\`\`markdown\\n\`\`\`typescript\\ncon..." 1`] = `
+"\`\`\`\`markdown
+\`\`\`typescript
+const code = "nested";
+\`\`\`
+\`\`\`\`
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "\`\`\`typescript\\nconst a = 1;\\n\`\`\`..." 1`] = `
+"\`\`\`typescript
+const a = 1;
+\`\`\`
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "| Header A | Header B |\\n| --- ..." 1`] = `
+"| Header A | Header B |
+| --- | --- |
+| Value 1 | Value 2 |
+| Value 3 | Value 4 |
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "| Left Align | Centered | Righ..." 1`] = `
+"| Left Align | Centered | Right Align |
+| :--- | :---: | ---: |
+| Left 1 | Center 1 | Right 1 |
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "--- tiêu đề không hợp lệ ---\\nN..." 1`] = `
+"--- tiêu đề không hợp lệ ---
+Nội dung văn bản bên dưới
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "---\\ntitle: WriteFlow Plan\\nvers..." 1`] = `
+"---
+title: WriteFlow Plan
+version: 1.0.0
+author: Antigravity
+---
+
+# Main Content
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "---\\nĐây là dòng kẻ ngang 1\\n---..." 1`] = `
+"---
+
+## Đây là dòng kẻ ngang 1
+
+## Đây là nội dung giữa
+
+Đây là dòng kẻ ngang 2
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "A <!-- comment 1 --> B <!-- co..." 1`] = `
+"A <!-- comment 1 --> B <!-- comment 2 --> C
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Bản quyền &copy; 2026 &mdash; ..." 1`] = `
+"Bản quyền &copy; 2026 &mdash; WriteFlow Project.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Click here ![Icon](https://exa..." 1`] = `
+"Click here ![Icon](https://example.com/icon.png "Action Icon") to proceed.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Dòng 1<br>Dòng 2<br/>Dòng 3\\n..." 1`] = `
+"Dòng 1\\
+Dòng 2\\
+Dòng 3
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "First line<br>Second line<br/>..." 1`] = `
+"First line\\
+Second line\\
+Third line
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Hình ảnh minh họa: <img src="h..." 1`] = `
+"Hình ảnh minh họa: <img src="https://example.com/logo.png" alt="WriteFlow Logo" width="300" height="150" style="border-radius: 8px;" /> trong văn bản.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Nhấn phím <kbd>Ctrl</kbd> + <k..." 1`] = `
+"Nhấn phím <kbd>Ctrl</kbd> + <kbd>C</kbd> để sao chép.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Nội dung đầu <!-- đây là ghi c..." 1`] = `
+"Nội dung đầu <!-- đây là ghi chú nội dòng cần bảo vệ --> nội dung cuối.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Vui lòng truy cập <a href="htt..." 1`] = `
+"Vui lòng truy cập <a href="https://example.com" target="_blank" rel="noopener">trang chủ</a> để biết thêm.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Văn bản có tham chiếu[^1].\\n\\n[^..." 1`] = `
+"Văn bản có tham chiếu[^1].
+
+[^1]: Đây là nội dung chi tiết của chú thích chân trang.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Xem trạng thái <span class="ba..." 1`] = `
+"Xem trạng thái <span class="badge">Đã duyệt</span> và <code>npm run test</code>.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Xem tại [Liên kết][home].\\n\\n[ho..." 1`] = `
+"Xem tại [Liên kết](https://writeflow.dev "Trang chủ WriteFlow").
+
+[home]: https://writeflow.dev "Trang chủ WriteFlow"
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Đoạn này dùng <b>HTML thô</b> ..." 1`] = `
+"Đoạn này dùng <b>HTML thô</b> chứ không dùng Markdown.
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots edge case input: "Đây là khẳng định quan trọng[^..." 1`] = `
+"Đây là khẳng định quan trọng[^1] cần kiểm chứng[^note2].
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "    four leading spaces" 1`] = `
+"&#32;   four leading spaces
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "# not heading" 1`] = `
+"\\# not heading
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "## second heading" 1`] = `
+"\\## second heading
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "###### sixth heading" 1`] = `
+"\\###### sixth heading
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "&amp;" 1`] = `
+"&amp;amp;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "&copy;" 1`] = `
+"&copy;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "&lt;" 1`] = `
+"&amp;lt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "* not bullet star" 1`] = `
+"\\* not bullet star
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "***" 1`] = `
+"\\*\\*\\*
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "+ not bullet plus" 1`] = `
+"\\+ not bullet plus
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "<a>not html link</a>" 1`] = `
+"\\<a&gt;not html link&lt;/a&gt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "<b>not html bold</b>" 1`] = `
+"\\<b&gt;not html bold&lt;/b&gt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "<tag>" 1`] = `
+"\\<tag&gt;
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "> not a blockquote" 1`] = `
+"&gt; not a blockquote
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "___" 1`] = `
+"\\_\\_\\_
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "\`\`\` not fenced code" 1`] = `
+"\\\`\\\`\\\` not fenced code
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "~~~ not tilde code" 1`] = `
+"\\~\\~\\~ not tilde code
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "- [ ] not a task item" 1`] = `
+"\\- \\[ \\] not a task item
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "- [x] not a completed task" 1`] = `
+"\\- \\[x\\] not a completed task
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "- not bullet list" 1`] = `
+"\\- not bullet list
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "---" 1`] = `
+"\\---
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "1) option A" 1`] = `
+"1\\) option A
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "1. item" 1`] = `
+"1\\. item
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "42) answer" 1`] = `
+"42\\) answer
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 3. Claude Edge Cases & Serializer Escape Baseline > snapshots serializer escape case: "1986. year of birth" 1`] = `
+"1986\\. year of birth
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 1: empty doc paragraph 1`] = `""`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 2: a, empty paragraph, b 1`] = `
+"a
+
+
+
+b
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 3: bulletList empty paragraph 1`] = `
+"-
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 4: blockquote empty paragraph 1`] = `
+">
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 5: taskList empty paragraph 1`] = `
+"- [ ]
+"
+`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 6a: heading empty 1`] = `""`;
+
+exports[`Task 2.4c: Golden Baseline Snapshots (Captured on commit 62ac3b9 & 3ad8344) > 4. Group A Empty Blocks Baseline (From 3ad8344) > golden 6b: codeBlock empty 1`] = `
+"\`\`\`
+
+\`\`\`
+"
+`;
