@@ -29,6 +29,14 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 ## 3. Đường kẻ ngang (Thematic Breaks / Horizontal Rules)
 - **Chuẩn hóa ký tự**:
   - Các biến thể như `***`, `___`, hoặc `* * *` khi xuất ra sẽ được chuẩn hóa thành `---` đứng riêng dòng có dòng trống cách ly.
+- **Dòng trống phân cách trong khối chứa (Task 2.4c Nhóm C)**:
+  - Khi một đường kẻ ngang (`---`) nằm ngay sau một đoạn văn trong khối danh sách (`listItem`), Serializer chèn thêm một dòng trống (`\n---`) để tạo cấu trúc:
+    ```markdown
+    - Đoạn văn
+
+      ---
+    ```
+  - Lý do: Theo chuẩn CommonMark, nếu không có dòng trống ngăn cách, dòng `- a\n  ---` sẽ bị phân tích nhầm thành tiêu đề Setext level 2 thay vì một đoạn văn và một đường kẻ ngang.
 
 ## 4. Liên kết & Đường dẫn (Links)
 - **Reference-style Links -> Inline Links**:
@@ -55,16 +63,18 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 - **Snake Case Escaping**: Ký tự gạch dưới giữa từ như `snake_case` được tự động escape thành `snake\_case` để tránh nhầm lẫn với cú pháp nhấn mạnh in nghiêng của markdown lexer.
 
 ## 7. Ký tự thoát & Ngắt dòng (Escaping & Line Breaks)
-- **Ngắt dòng cứng (Hard Line Break - Plan 9.3)**:
+- **Ngắt dòng cứng (Hard Line Break - Plan 9.3 & Task 2.4c Nhóm B)**:
   - Thẻ `<br>` hoặc 2 khoảng trắng cuối dòng được chuẩn hóa thành dấu gạch chéo ngược `\` ở cuối dòng (`\\\n`), loại bỏ rủi ro bị các công cụ format/linter tự động xóa bỏ trailing spaces.
   - Xóa khoảng trắng thừa (trailing spaces) vô nghĩa ở cuối các dòng văn bản thông thường.
+  - **Bỏ ngắt dòng cứng ở cuối khối (Task 2.4c Nhóm B)**: Khi một hoặc nhiều `hardBreak` nằm ở vị trí kết thúc của một khối đoạn văn (`paragraph`), các ngắt dòng cứng này sẽ được tự động lược bỏ thay vì xuất ra `\\\n\n`, nhằm tránh tạo các dòng trống giả hoặc vi phạm định dạng CommonMark ở ranh giới khối (ví dụ `[text, hardBreak]` trong listItem chuyển thành `- text\n`).
 - **Ký tự thoát không cần thiết**: Các ký tự `\#`, `\.`, `\|` khi không nằm trong ngữ cảnh xung đột cú pháp sẽ được bỏ dấu `\` để văn bản tự nhiên.
-- **Thoát ký tự đầu dòng đoạn văn (Line-Start Syntax Escaping - Plan 9.5 P0)**:
-  - Để ngăn chặn việc văn bản thuần bị biến thành cấu trúc khối (Block Structures) khi mở lại (Round-trip), Serializer tự động thêm dấu thoát `\` khi dòng bắt đầu bằng các cú pháp đặc thù:
-    + Heading: `# ` hoặc `## ` -> `\# ` hoặc `\## `
-    + Ordered List: `^[0-9]+[\.\)] ` (ví dụ `1. `, `1986. `, `1) `) -> `1\. `, `1986\. `, `1\) `
-    + Bullet List: `- `, `+ `, `* ` -> `\- `, `\+ `, `\* `
+- **Thoát ký tự đầu dòng đoạn văn (Line-Start Syntax Escaping - Plan 9.5 P0 & Task 2.4c Nhóm D)**:
+  - Để ngăn chặn việc văn bản thuần bị biến thành cấu trúc khối (Block Structures) khi mở lại (Round-trip), Serializer tự động thêm dấu thoát `\` khi dòng bắt đầu bằng các cú pháp đặc thù (theo sau bởi khoảng trắng hoặc kết thúc dòng):
+    + Heading: `^(#{1,6})(\s+|$)` (kể cả dòng chỉ có `#` đơn độc) -> `\#` hoặc `\######`
+    + Ordered List: `^([0-9]+)([.)])(\s+|$)` (ví dụ `1.`, `1986.`, `1)`) -> `1\.`, `1986\.`, `1\)`
+    + Bullet List: `^([-+*])(\s+|$)` (kể cả dòng chỉ có `+`, `-`, `*`) -> `\+`, `\-`, `\*`
     + Task List: `- [ ] `, `- [x] ` -> `\- \[ \] `, `\- \[x\] `
+    + Định nghĩa tham chiếu dạng văn bản thuần: `^(\[[^\]]+\]:)` (ví dụ `[ref]: http://x`) -> `\[ref]: http://x` (bảo toàn dấu thoát ngoặc vuông mở để không bị parse nhầm thành reference definition)
     + Horizontal Rule: `---` -> `\---`
     + Blockquote: `> ` -> `\> `
     + Indented Code: 4 khoảng trắng đầu dòng `    ` -> `&#32;   ` (ngăn indented code block và phục hồi 4 dấu cách khi parse)

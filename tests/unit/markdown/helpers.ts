@@ -54,10 +54,17 @@ function cleanAttrs(
 /**
  * Clean up marks on inline nodes.
  */
-function cleanMarks(marks?: JSONContent['marks']): JSONContent['marks'] | undefined {
+function cleanMarks(marks?: JSONContent['marks'], nodeText?: string): JSONContent['marks'] | undefined {
   if (!marks || !Array.isArray(marks) || marks.length === 0) return undefined;
 
   const cleanedMarks = marks
+    .filter((mark) => {
+      // Normalize bare URLs autolinked by GFM where text matches href
+      if (mark.type === 'link' && mark.attrs?.href && mark.attrs.href === nodeText) {
+        return false;
+      }
+      return true;
+    })
     .map((mark) => {
       const cleaned: Record<string, unknown> = { type: mark.type };
       if (mark.attrs) {
@@ -83,6 +90,18 @@ function cleanMarks(marks?: JSONContent['marks']): JSONContent['marks'] | undefi
 export function normalizeTree(node: JSONContent): JSONContent {
   if (!node || typeof node !== 'object') return node;
 
+  // Treat rawBlock reference_def and footnote as equivalent to plain text paragraph
+  if (
+    node.type === 'rawBlock' &&
+    (node.attrs?.format === 'reference_def' || node.attrs?.format === 'footnote') &&
+    typeof node.attrs?.content === 'string'
+  ) {
+    return {
+      type: 'paragraph',
+      content: [{ type: 'text', text: node.attrs.content }],
+    };
+  }
+
   const result: JSONContent = {
     type: node.type,
   };
@@ -96,7 +115,7 @@ export function normalizeTree(node: JSONContent): JSONContent {
     result.text = node.text;
   }
 
-  const cleanedMarks = cleanMarks(node.marks);
+  const cleanedMarks = cleanMarks(node.marks, node.text);
   if (cleanedMarks) {
     result.marks = cleanedMarks;
   }

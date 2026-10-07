@@ -7,6 +7,7 @@ import HardBreak from '@tiptap/extension-hard-break';
 import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import type { AnyExtension } from '@tiptap/core';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import {
   RawBlockExtension,
   RawTableExtension,
@@ -22,14 +23,14 @@ import {
 export function escapeParagraphLineStarts(content: string): string {
   const lines = content.split('\n');
   const escapedLines = lines.map((line) => {
-    // 1. Heading # or ## etc.
-    let l = line.replace(/^(#{1,6}\s+)/, '\\$1');
-    // 2. Ordered list: 1. or 1986. or 1)
-    l = l.replace(/^([0-9]+)([.)])(\s+)/, '$1\\$2$3');
+    // 1. Heading # or ## etc. followed by space or end of line (Task 2.4c Group D)
+    let l = line.replace(/^(#{1,6})(\s+|$)/, '\\$1$2');
+    // 2. Ordered list: 1. or 1986. or 1) followed by space or end of line (Task 2.4c Group D)
+    l = l.replace(/^([0-9]+)([.)])(\s+|$)/, '$1\\$2$3');
     // 3. Task list: - [ ] or - [x]
     l = l.replace(/^([-+*])\s+\[([ xX])\](\s+)/, '\\$1 \\[$2\\]$3');
-    // 4. Bullet list: - or + or * followed by space
-    l = l.replace(/^([-+*])(\s+)/, '\\$1$2');
+    // 4. Bullet list: - or + or * followed by space or end of line (Task 2.4c Group D)
+    l = l.replace(/^([-+*])(\s+|$)/, '\\$1$2');
     // 5. Horizontal rule: --- or *** or ___
     l = l.replace(/^([-*_]{3,})(\s*)$/, '\\$1$2');
     // 6. Blockquote: >
@@ -38,7 +39,9 @@ export function escapeParagraphLineStarts(content: string): string {
     l = l.replace(/^ {4}/, '&#32;   ');
     // 8. Fenced code: ``` or ~~~
     l = l.replace(/^(`{3,}|~{3,})/, '\\$1');
-    // 9. Plain text tags &lt;tag&gt; or <tag> -> \<tag>
+    // 9. Plain text reference definition line: [ref]: http (Task 2.4c Group D)
+    l = l.replace(/^(\[[^\]]+\]:)/, '\\$1');
+    // 10. Plain text tags &lt;tag&gt; or <tag> -> \<tag>
     l = l.replace(/^&lt;(\/?(?:[a-zA-Z][\w-]*))/, '\\<$1');
     return l;
   });
@@ -46,11 +49,33 @@ export function escapeParagraphLineStarts(content: string): string {
 }
 
 /**
- * Custom Paragraph extension that automatically escapes syntax at line starts.
+ * Custom Paragraph extension that avoids infinite recursion on empty content (Task 2.4c Group A),
+ * trims trailing hardBreaks at block boundaries (Task 2.4c Group B),
+ * and automatically escapes syntax at line starts (Plan 9.5 P0).
  */
 export const CustomParagraph = Paragraph.extend({
-  renderMarkdown(node, h) {
-    const raw = h.renderChildren(node);
+  renderMarkdown(node, h, ctx) {
+    if (!node) {
+      return '';
+    }
+
+    const content = Array.isArray(node.content) ? node.content : [];
+
+    // Trim trailing hardBreak nodes at block boundary (Task 2.4c Group B)
+    let end = content.length;
+    while (end > 0 && content[end - 1]?.type === 'hardBreak') {
+      end--;
+    }
+    const trimmed = end < content.length ? content.slice(0, end) : content;
+
+    if (trimmed.length === 0) {
+      // Emit &nbsp; for consecutive empty paragraphs to preserve blank lines
+      const prevContent = Array.isArray(ctx?.previousNode?.content) ? ctx.previousNode.content : [];
+      const prevIsEmpty = ctx?.previousNode?.type === 'paragraph' && prevContent.length === 0;
+      return prevIsEmpty ? '&nbsp;' : '';
+    }
+
+    const raw = h.renderChildren(trimmed);
     return escapeParagraphLineStarts(raw);
   },
 });
@@ -61,6 +86,19 @@ export const CustomParagraph = Paragraph.extend({
 export const CustomHardBreak = HardBreak.extend({
   renderMarkdown() {
     return '\\\n';
+  },
+});
+
+/**
+ * Custom HorizontalRule extension that ensures a blank line between paragraph and hr
+ * in list containers to prevent CommonMark Setext heading collision (Task 2.4c Group C).
+ */
+export const CustomHorizontalRule = HorizontalRule.extend({
+  renderMarkdown(_node, _h, ctx) {
+    if (ctx?.previousNode?.type === 'paragraph' && ctx?.parentType === 'listItem') {
+      return '\n---';
+    }
+    return '---';
   },
 });
 
@@ -253,7 +291,7 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
       link: false,
       codeBlock: false,
       underline: false,
-      horizontalRule: {},
+      horizontalRule: false,
       strike: {},
       heading: {
         levels: [1, 2, 3, 4, 5, 6],
@@ -264,6 +302,7 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     }),
     CustomParagraph,
     CustomHardBreak,
+    CustomHorizontalRule,
     CustomLink.configure({
       openOnClick: false,
     }),

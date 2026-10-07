@@ -24,8 +24,8 @@ export function normalizeSerializedMarkdown(markdown: string): string {
   // 2. Restore footnote references (\[^1\] -> [^1])
   result = result.replace(/\\\[\^([^\s\]]+)\\\]/g, (_m, id) => `[^${id}]`);
 
-  // 3. Restore reference definitions and footnote definitions (\[^1\]: -> [^1]:, \[ref\]: -> [ref]:)
-  result = result.replace(/^\\\[(\^?[^\]]+)\\\]:/gm, (_m, id) => `[${id}]:`);
+  // 3. Keep opening bracket escaped for reference definitions at line-start: \[ref\]: -> \[ref]: (Task 2.4c Group D)
+  result = result.replace(/^\\\[([^\]]+)\\\]:/gm, (_m, id) => `\\[${id}]:`);
 
   return result;
 }
