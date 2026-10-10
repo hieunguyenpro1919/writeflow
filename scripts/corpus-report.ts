@@ -6,6 +6,7 @@ import { serialize } from '../src/core/markdown/serializer';
 
 export interface FileReport {
   filename: string;
+  category: 'oss' | 'real' | 'synthetic';
   sourceDesc: string;
   originalBytes: number;
   s1Bytes: number;
@@ -27,6 +28,7 @@ export interface FileReport {
   };
   group: 1 | 2 | 3 | 'CLEAN';
   differences: string[];
+  defects: string[];
 }
 
 export interface Inventory {
@@ -173,6 +175,13 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
     const rawBuffer = fs.readFileSync(filePath);
     const originalContent = rawBuffer.toString('utf8');
 
+    // Category
+    const category: 'oss' | 'real' | 'synthetic' = filename.startsWith('oss/')
+      ? 'oss'
+      : filename.startsWith('real/')
+        ? 'real'
+        : 'synthetic';
+
     // Preserve options (BOM, EOL)
     const hasBOM = rawBuffer.length >= 3 && rawBuffer[0] === 0xef && rawBuffer[1] === 0xbb && rawBuffer[2] === 0xbf;
     const isCRLF = originalContent.includes('\r\n');
@@ -213,6 +222,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
     };
 
     const differences: string[] = [];
+    const defects: string[] = [];
 
     if (!parseThrows) {
       try {
@@ -221,6 +231,31 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
         invDiff = compareInventories(invOrig, invS1);
       } catch (e: any) {
         invDiff.details.push(`Inventory extraction error: ${e.message}`);
+      }
+
+      // Check defect patterns B2, B6, B1b, B8, N1
+      const origBadges = (originalContent.match(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g) || []).length;
+      const s1Badges = (s1.match(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g) || []).length;
+      if (origBadges > 0 && s1Badges < origBadges) {
+        defects.push(`B2: Badge link lost (${origBadges} -> ${s1Badges})`);
+      }
+
+      const origAImg = (originalContent.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || []).length;
+      const s1AImg = (s1.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || []).length;
+      if (origAImg > 0 && s1AImg < origAImg) {
+        defects.push(`B6: HTML <a><img></a> to bare img (${origAImg} -> ${s1AImg})`);
+      }
+
+      if (/(?:<br\s*\/?>|\\\n|  \n)/i.test(originalContent) && (s1.includes('\\\n\n') || !isIdempotent)) {
+        defects.push('B1b: Trailing backslash / br line break');
+      }
+
+      if (/>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i.test(originalContent) && />\s*\\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)/i.test(s1)) {
+        defects.push('B8: Callout alert escaped');
+      }
+
+      if (/(\s&|\w&|&\w|&\s)/.test(originalContent) && !originalContent.includes('&amp;') && s1.includes('&amp;')) {
+        defects.push('N1: Bare & converted to &amp;');
       }
 
       if (!isByteExact) {
@@ -252,6 +287,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
 
     reports.push({
       filename,
+      category,
       sourceDesc: '',
       originalBytes: Buffer.byteLength(originalContent, 'utf8'),
       s1Bytes: Buffer.byteLength(s1, 'utf8'),
@@ -264,13 +300,14 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
       inventoryDiff: invDiff,
       group,
       differences,
+      defects,
     });
   }
 
   return reports;
 }
 
-if (import.meta.url.endsWith(process.argv[1]) || process.argv[1]?.includes('corpus-report')) {
+if (import.meta.url.endsWith(process.argv[1]?.replace(/\\/g, '/')) || process.argv[1]?.includes('corpus-report')) {
   const corpusDir = path.resolve(process.cwd(), 'tests/fixtures/markdown/corpus');
   const reports = runCorpusEvaluation(corpusDir);
 
@@ -278,31 +315,53 @@ if (import.meta.url.endsWith(process.argv[1]) || process.argv[1]?.includes('corp
   console.log(`WRITEFLOW CORPUS ROUNDTRIP EVALUATION REPORT (${reports.length} FILES)`);
   console.log('='.repeat(80));
 
-  let cleanCount = 0;
-  let g1Count = 0;
-  let g2Count = 0;
-  let g3Count = 0;
+  const categories = [
+    { key: 'oss' as const, title: 'PHẦN A: 22 FILE TÀI LIỆU UPSTREAM OSS NGUYÊN BẢN' },
+    { key: 'real' as const, title: 'PHẦN B: 9 FILE TÀI LIỆU THẬT NỘI BỘ REPO WRITEFLOW' },
+    { key: 'synthetic' as const, title: 'PHẦN C: 31 FILE TỰ SOẠN & CA BIÊN KỸ THUẬT' },
+  ];
 
-  for (const r of reports) {
-    const status = r.group === 'CLEAN' ? '✅ CLEAN' : r.group === 2 ? '⚠️ GROUP 2 (Norm)' : r.group === 3 ? '❌ GROUP 3 (Non-Idem)' : '🚨 GROUP 1 (Loss)';
-    console.log(`[${status}] ${r.filename} | Orig: ${r.originalBytes}B -> S1: ${r.s1Bytes}B -> S2: ${r.s2Bytes}B | Idempotent: ${r.isIdempotent}`);
-    if (r.differences.length > 0) {
-      console.log(`    Diffs: ${r.differences.join('; ')}`);
-    }
-    if (r.inventoryDiff.details.length > 0) {
-      console.log(`    Inv: ${r.inventoryDiff.details.join('; ')}`);
-    }
-    if (r.error) {
-      console.log(`    Error: ${r.error}`);
-    }
+  let cleanTotal = 0;
+  let g2Total = 0;
+  let g3Total = 0;
+  let g1Total = 0;
 
-    if (r.group === 'CLEAN') cleanCount++;
-    else if (r.group === 2) g2Count++;
-    else if (r.group === 3) g3Count++;
-    else if (r.group === 1) g1Count++;
+  for (const cat of categories) {
+    const list = reports.filter((r) => r.category === cat.key);
+    console.log(`\n${cat.title} (${list.length} files)`);
+    console.log('-'.repeat(80));
+
+    for (const r of list) {
+      const status =
+        r.group === 'CLEAN'
+          ? '✅ CLEAN'
+          : r.group === 2
+            ? '⚠️ GROUP 2 (Norm)'
+            : r.group === 3
+              ? '❌ GROUP 3 (Non-Idem)'
+              : '🚨 GROUP 1 (Loss)';
+      console.log(`[${status}] ${r.filename} | Orig: ${r.originalBytes}B -> S1: ${r.s1Bytes}B -> S2: ${r.s2Bytes}B | Idempotent: ${r.isIdempotent}`);
+      if (r.defects.length > 0) {
+        console.log(`    Defects: ${r.defects.join('; ')}`);
+      }
+      if (r.differences.length > 0) {
+        console.log(`    Diffs: ${r.differences.join('; ')}`);
+      }
+      if (r.inventoryDiff.details.length > 0) {
+        console.log(`    Inv: ${r.inventoryDiff.details.join('; ')}`);
+      }
+      if (r.error) {
+        console.log(`    Error: ${r.error}`);
+      }
+
+      if (r.group === 'CLEAN') cleanTotal++;
+      else if (r.group === 2) g2Total++;
+      else if (r.group === 3) g3Total++;
+      else if (r.group === 1) g1Total++;
+    }
   }
 
-  console.log('-'.repeat(80));
-  console.log(`TOTAL: ${reports.length} files | CLEAN: ${cleanCount} | GROUP 2: ${g2Count} | GROUP 3: ${g3Count} | GROUP 1: ${g1Count}`);
+  console.log('\n' + '='.repeat(80));
+  console.log(`TỔNG KẾT TOÀN DIỆN: ${reports.length} files | CLEAN: ${cleanTotal} | GROUP 2: ${g2Total} | GROUP 3: ${g3Total} | GROUP 1: ${g1Total}`);
   console.log('='.repeat(80));
 }

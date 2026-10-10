@@ -21,10 +21,15 @@
 | **TD-07** | Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2 | Task 2.4c Ma trận 3b | Thấp | Đã sửa (Task 2.5a, 2.5a-fix) | Đã sửa (Task 2.5a, 2.5a-fix) |
 | **TD-08** | Task item chứa block non-text bị marked parse thành bullet text `[ ]` | Task 2.4c Ma trận 3b | Trung bình | Hoãn đến Phase 6 | Hoãn đến Phase 6. Điều kiện cứng: phải sửa xong trước khi bật nút Task list trong UI |
 | **TD-09** | HorizontalRule ở vị trí only/first trong list item không có đoạn văn neo | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
-| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`oss-jest-guide.md`, `oss-react-tutorial.md`, `oss-rust-cli-guide.md`) |
-| **TD-11** | Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`, `<mark>`, `<sub>`, `<sup>`) bị mất hoặc thoát | Task 2.5b (Corpus) | Nghiêm trọng | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`oss-github-cheatsheet.md`, `oss-redux-readme.md`, `oss-katex-readme.md`) |
-| **TD-12** | Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link | Task 2.5b (Corpus) | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`13-html-link-img-extended.md`) |
-| **TD-13** | Code span chứa ký tự phân cách thoát (`\~~~`, `\``` `) bị bọc thêm backtick và escape trên serialize lần 2 | Task 2.5b-fix (Corpus) | Thấp | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `repo-markdown-normalizations.md` |
+| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix2 (`oss/express-history.md`, `oss/jest-readme.md`) |
+| **TD-11** | Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`, `<mark>`, `<sub>`, `<sup>`) bị mất hoặc thoát | Task 2.5b (Corpus) | Nghiêm trọng | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix2 (`synthetic/12-html-inline-tags.md`, `synthetic/14-html-mixed-raw.md`) |
+| **TD-12** | Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link | Task 2.5b (Corpus) | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix2 (`synthetic/13-html-link-img-extended.md`) |
+| **TD-13** | Code span chứa ký tự phân cách thoát (`\~~~`, `\``` `) bị bọc thêm backtick và escape trên serialize lần 2 | Task 2.5b-fix (Corpus) | Thấp | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `real/repo-markdown-normalizations.md` |
+| **B2** | Link bọc ảnh huy hiệu CI badge `[![badge](img)](url)` bị mất link ngoài | Upstream OSS (Task 2.5b-fix2) | Nghiêm trọng (Mất URL) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên 15 file thật (`oss/axios-readme.md`, `oss/electron-readme.md`, `oss/jest-readme.md`, `oss/katex-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/mermaid-readme.md`, `oss/prettier-readme.md`, `oss/react-readme.md`, `oss/redux-readme.md`, `oss/ripgrep-readme.md`, `oss/tiptap-readme.md`, `oss/vscode-readme.md`, `oss/zustand-readme.md`, `real/repo-readme.md`) |
+| **B6** | Thẻ HTML `<a href><img></a>` bị bóc tách thành ảnh trần | Upstream OSS (Task 2.5b-fix2) | Nghiêm trọng (Mất URL) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên 3 file thật (`oss/jest-readme.md`, `oss/katex-readme.md`, `oss/redux-readme.md`) |
+| **B1b** | Ngắt dòng cuối đoạn văn hoặc `<br>` để lại ký tự `\` gấp đôi thành `\\` trên vòng serialize thứ 2 | Upstream OSS (Task 2.5b-fix2) | Trung bình (Group 3) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `oss/lodash-readme.md`, `oss/mermaid-readme.md`, `synthetic/12-html-inline-tags.md` |
+| **B8** | GitHub callout alerts `> [!NOTE]` bị escape dấu ngoặc vuông thành `> \[!NOTE\]` | Upstream OSS (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `oss/axios-readme.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md` |
+| **N1** | Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;` | Upstream OSS & Repo (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên 14 file (`oss/awesome-readme.md`, `oss/express-history.md`, `oss/express-readme.md`, `oss/keep-a-changelog.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/redux-readme.md`, `real/repo-qa-manual.md`, `real/repo-readme.md`, `real/repo-tasks-phase-1.md`, `real/repo-tasks-phase-2.md`, `real/repo-versions.md`, `synthetic/27-edge-syntax-as-text.md`) |
 
 ---
 
@@ -129,3 +134,43 @@
 - **Hành vi hiện tại:** Vòng serialize thứ nhất sinh ra `` `\~~~` ``, nhưng vòng serialize thứ hai chuyển thành `` ` \~\~\~\` `` do bộ escape ký tự dấu ngã của serializer, dẫn đến `s2 !== s1` (không idempotent).
 - **Hành vi mong muốn:** Bộ serializer kiểm tra ngữ cảnh code span và tránh escape trùng lặp các ký tự bên trong hoặc liền kề code span.
 - **Mức độ & Kế hoạch:** Thấp (Group 3). Cần xử lý trước Gate A.
+
+### B2: Link bọc ảnh huy hiệu CI badge `[![badge](img)](url)` bị mất link ngoài
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: 15 file (`oss/axios-readme.md`, `oss/electron-readme.md`, `oss/jest-readme.md`, `oss/katex-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/mermaid-readme.md`, `oss/prettier-readme.md`, `oss/react-readme.md`, `oss/redux-readme.md`, `oss/ripgrep-readme.md`, `oss/tiptap-readme.md`, `oss/vscode-readme.md`, `oss/zustand-readme.md`, `real/repo-readme.md`).
+  - Chuỗi Markdown mẫu: `[![npm version](https://badge.fury.io/js/axios.svg)](https://badge.fury.io/js/axios)`
+- **Hành vi hiện tại:** Tiptap schema xử lý node `image` là leaf node độc lập không lồng mark `link`, khiến link ngoài bọc ảnh bị loại bỏ hoàn toàn, chỉ còn lại `![npm version](https://badge.fury.io/js/axios.svg)`. Mất 100% URL điều hướng của badge.
+- **Hành vi mong muốn:** Hỗ trợ link mark trên image node hoặc bọc ảnh trong link inline chuẩn CommonMark.
+- **Mức độ & Kế hoạch:** Nghiêm trọng (Mất dữ liệu URL người dùng — Vi phạm Nguyên tắc số 10). Cần xử lý qua Task Card riêng trước Gate A.
+
+### B6: Thẻ HTML `<a href><img></a>` bị bóc tách thành ảnh trần
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: `oss/jest-readme.md`, `oss/katex-readme.md`, `oss/redux-readme.md`.
+  - Chuỗi Markdown mẫu: `<a href="https://opencollective.com/jest"><img src="https://opencollective.com/jest/backers.svg"></a>`
+- **Hành vi hiện tại:** DOMParser nhận diện thẻ `<img>` bên trong `<a>` và chuyển thành node image của ProseMirror mà không bảo tồn thẻ bao bọc `<a>`, làm mất liên kết tài trợ / nhà tài trợ.
+- **Hành vi mong muốn:** Kén bảo vệ cấu trúc liên kết ảnh HTML thô qua `rawBlock` / `rawInline` hoặc link mark trên image.
+- **Mức độ & Kế hoạch:** Nghiêm trọng (Mất URL). Cần xử lý qua Task Card riêng trước Gate A.
+
+### B1b: Ngắt dòng cuối đoạn văn hoặc `<br>` để lại ký tự `\` gấp đôi thành `\\` trên vòng serialize thứ 2
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: `oss/lodash-readme.md`, `oss/mermaid-readme.md`, `synthetic/12-html-inline-tags.md`.
+  - Chuỗi Markdown mẫu: `"Line 1<br>\nLine 2"` hoặc `"Line 1\\\nLine 2"`
+- **Hành vi hiện tại:** Thẻ `<br>` hoặc hardBreak ở cuối đoạn văn được serialize thành `\` ở cuối dòng. Vòng serialize thứ 2 nhận diện `\` như văn bản thường và escape thành `\\` (không idempotent: `s2 !== s1`).
+- **Hành vi mong muốn:** Chuẩn hóa quy tắc HardBreak và trailing backslash của serializer để đảm bảo tính idempotent tuyệt đối.
+- **Mức độ & Kế hoạch:** Trung bình (Group 3). Cần xử lý qua Task Card riêng trước Gate A.
+
+### B8: GitHub callout alerts `> [!NOTE]` bị escape dấu ngoặc vuông thành `> \[!NOTE\]`
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: `oss/axios-readme.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md`.
+  - Chuỗi Markdown mẫu: `"> [!NOTE]\n> This is an alert."`
+- **Hành vi hiện tại:** Bộ escape đầu dòng hoặc paragraph escape nhận diện `[` trong trích dẫn và thêm dấu thoát `\\[`, biến alert chuẩn GitHub thành trích dẫn văn bản chứa dấu ngoặc vuông thoát.
+- **Hành vi mong muốn:** Bảo toàn cú pháp GitHub Callouts / Alerts `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`.
+- **Mức độ & Kế hoạch:** Thấp (Group 2). Cần xử lý qua Task Card riêng trước Gate A.
+
+### N1: Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;`
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: 14 file (`oss/awesome-readme.md`, `oss/express-history.md`, `oss/express-readme.md`, `oss/keep-a-changelog.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/redux-readme.md`, `real/repo-qa-manual.md`, `real/repo-readme.md`, `real/repo-tasks-phase-1.md`, `real/repo-tasks-phase-2.md`, `real/repo-versions.md`, `synthetic/27-edge-syntax-as-text.md`).
+  - Chuỗi Markdown mẫu: `"Research & Development"`, `"arrayLimit & denial of service"`
+- **Hành vi hiện tại:** DOMParser chuyển ký tự `&` trong text thành `&amp;` hoặc serializer tự động sinh `&amp;` khi xuất ra Markdown.
+- **Hành vi mong muốn:** Ký tự `&` giữa dòng trong văn bản thuần Markdown không cần và không được mã hóa thành `&amp;` trừ khi là entity hợp lệ.
+- **Mức độ & Kế hoạch:** Thấp (Group 2). Cần xử lý qua Task Card riêng trước Gate A.
