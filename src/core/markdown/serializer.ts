@@ -27,7 +27,28 @@ export function normalizeSerializedMarkdown(markdown: string): string {
   // 3. Keep opening bracket escaped for reference definitions at line-start: \[ref\]: -> \[ref]: (Task 2.4c Group D)
   result = result.replace(/^\\\[([^\]]+)\\\]:/gm, (_m, id) => `\\[${id}]:`);
 
+  // 4. Restore protected spaces inside code spans (B3)
+  result = result.replace(/\uE000/g, ' ');
+
+  // 5. Restore HTML comments inside code spans or table cells (B4)
+  result = result.replace(
+    /<span data-raw-inline="" data-raw-comment="true">&lt;!--([\s\S]*?)--&gt;<\/span>/g,
+    '<!--$1-->',
+  );
+
   return result;
+}
+
+function protectCodeSpaces(node: JSONContent): JSONContent {
+  if (!node) return node;
+  if (node.type === 'text' && node.marks?.some((m) => m.type === 'code')) {
+    const text = node.text || '';
+    if (text.startsWith(' ') || text.endsWith(' ')) {
+      return { ...node, text: text.replace(/^ /, '\uE000').replace(/ $/, '\uE000') };
+    }
+  }
+  if (Array.isArray(node.content)) return { ...node, content: node.content.map(protectCodeSpaces) };
+  return node;
 }
 
 /**
@@ -39,7 +60,7 @@ export function serialize(
   frontmatter?: FrontmatterData,
   options?: MarkdownOptions,
 ): string {
-  const jsonContent: JSONContent = isProseMirrorNode(doc) ? doc.toJSON() : doc;
+  const jsonContent: JSONContent = protectCodeSpaces(isProseMirrorNode(doc) ? doc.toJSON() : doc);
   const manager = getSharedMarkdownManager();
 
   // 1. Serialize document body

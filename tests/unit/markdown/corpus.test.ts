@@ -57,72 +57,34 @@ export interface KnownFailureInfo {
 export const knownFailures: Record<string, KnownFailureInfo> = {
   // Upstream OSS defects
   'oss/axios-readme.md': {
-    codes: ['B2', 'B8'],
-    reason: 'CI badge image loses wrapping link (B2) and alert callout is escaped (B8)',
-  },
-  'oss/electron-readme.md': {
-    codes: ['B2'],
-    reason: 'CI badge image loses wrapping link (B2)',
+    codes: ['B8'],
+    reason: 'Alert callout is escaped (B8)',
   },
   'oss/express-history.md': {
     codes: ['TD-10', 'N1'],
-    reason: 'Indented list code block causes non-idempotent re-serialization and code blocks mismatch (TD-10), bare & to &amp; (N1)',
+    reason:
+      'Indented list code block causes non-idempotent re-serialization and code blocks mismatch (TD-10), bare & to &amp; (N1)',
     isNonIdempotent: true,
     hasCodeBlockMismatch: true,
   },
-  'oss/jest-readme.md': {
-    codes: ['B2', 'B6'],
-    reason: 'CI badge links lost (B2), HTML <a><img></a> converted to bare img (B6)',
-  },
-  'oss/katex-readme.md': {
-    codes: ['B2', 'B6'],
-    reason: 'CI badge links lost (B2), HTML <a><img></a> converted to bare img (B6)',
-  },
   'oss/lodash-readme.md': {
     codes: ['B1b', 'B8', 'N1'],
-    reason: 'Trailing backslash doubles on round 2 (B1b), callout escaped (B8), bare & to &amp; (N1)',
+    reason:
+      'Trailing backslash doubles on round 2 (B1b), callout escaped (B8), bare & to &amp; (N1)',
     isNonIdempotent: true,
   },
   'oss/markdown-it-readme.md': {
-    codes: ['B2', 'B8', 'N1'],
-    reason: 'Badge links lost (B2), callout escaped (B8), bare & to &amp; (N1)',
+    codes: ['B8', 'N1'],
+    reason: 'Callout escaped (B8), bare & to &amp; (N1)',
   },
   'oss/marked-readme.md': {
-    codes: ['B2', 'N1'],
-    reason: 'Badge links lost (B2), bare & to &amp; (N1)',
+    codes: ['N1'],
+    reason: 'Bare & to &amp; (N1)',
   },
   'oss/mermaid-readme.md': {
-    codes: ['B1b', 'B2'],
-    reason: 'Trailing backslash doubles on round 2 (B1b), badge links lost (B2)',
+    codes: ['B1b'],
+    reason: 'Trailing backslash doubles on round 2 (B1b)',
     isNonIdempotent: true,
-  },
-  'oss/prettier-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
-  },
-  'oss/react-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
-  },
-  'oss/redux-readme.md': {
-    codes: ['B2', 'B6'],
-    reason: 'Badge links lost (B2), HTML <a><img></a> converted to bare img (B6)',
-  },
-  'oss/ripgrep-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
-  },
-  'oss/tiptap-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
-  },
-  'oss/vscode-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
-  },
-  'oss/zustand-readme.md': {
-    codes: ['B2'],
-    reason: 'Badge links lost (B2)',
   },
   'oss/awesome-readme.md': {
     codes: ['N1'],
@@ -138,18 +100,13 @@ export const knownFailures: Record<string, KnownFailureInfo> = {
   },
 
   // Internal repo documents
-  'real/repo-markdown-normalizations.md': {
-    codes: ['TD-13'],
-    reason: 'Code span with escaped delimiter \\~~~ mutates backtick delimiters on round 2 (TD-13)',
-    isNonIdempotent: true,
-  },
   'real/repo-qa-manual.md': {
     codes: ['N1'],
     reason: 'Bare & converted to &amp; (N1)',
   },
   'real/repo-readme.md': {
-    codes: ['B2', 'N1'],
-    reason: 'Badge link lost (B2), bare & converted to &amp; (N1)',
+    codes: ['N1'],
+    reason: 'Bare & converted to &amp; (N1)',
   },
   'real/repo-tasks-phase-1.md': {
     codes: ['N1'],
@@ -167,16 +124,19 @@ export const knownFailures: Record<string, KnownFailureInfo> = {
   // Synthetic documents
   'synthetic/12-html-inline-tags.md': {
     codes: ['B1b', 'TD-11'],
-    reason: 'Trailing backslash doubles on round 2 (B1b), inline HTML tags stripped without rawInline (TD-11)',
+    reason:
+      'Trailing backslash doubles on round 2 (B1b), inline HTML tags stripped without rawInline (TD-11)',
     isNonIdempotent: true,
   },
   'synthetic/13-html-link-img-extended.md': {
     codes: ['TD-12'],
-    reason: 'Extended anchor and image HTML tags lose custom attributes when converted to markdown links (TD-12)',
+    reason:
+      'Extended anchor and image HTML tags lose custom attributes when converted to markdown links (TD-12)',
   },
   'synthetic/14-html-mixed-raw.md': {
     codes: ['TD-11'],
-    reason: 'Inline HTML tags inside mixed markdown blocks are stripped without rawInline preservation (TD-11)',
+    reason:
+      'Inline HTML tags inside mixed markdown blocks are stripped without rawInline preservation (TD-11)',
   },
   'synthetic/27-edge-syntax-as-text.md': {
     codes: ['N1'],
@@ -208,7 +168,11 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
     describe(`Corpus File: ${file}`, () => {
       const rawBuffer = fs.readFileSync(path.join(corpusDir, file));
       const original = rawBuffer.toString('utf8');
-      const hasBOM = rawBuffer.length >= 3 && rawBuffer[0] === 0xef && rawBuffer[1] === 0xbb && rawBuffer[2] === 0xbf;
+      const hasBOM =
+        rawBuffer.length >= 3 &&
+        rawBuffer[0] === 0xef &&
+        rawBuffer[1] === 0xbb &&
+        rawBuffer[2] === 0xbf;
       const isCRLF = original.includes('\r\n');
       const options = {
         eol: isCRLF ? ('crlf' as const) : ('lf' as const),
@@ -274,13 +238,17 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
           for (const code of failureInfo.codes) {
             if (code === 'B2') {
               // B2: Link wrapping badge image is stripped to bare image
-              const origBadges = (original.match(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g) || []).length;
+              const origBadges = (original.match(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g) || [])
+                .length;
               const s1Badges = (s1.match(/\[!\[[^\]]*\]\([^)]+\)\]\([^)]+\)/g) || []).length;
               expect(s1Badges).toBeLessThan(origBadges);
             } else if (code === 'B6') {
               // B6: HTML <a href><img ...></a> converted to bare img
-              const origAImg = (original.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || []).length;
-              const s1AImg = (s1.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || []).length;
+              const origAImg = (
+                original.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || []
+              ).length;
+              const s1AImg = (s1.match(/<a\s+[^>]*href[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/gi) || [])
+                .length;
               expect(s1AImg).toBeLessThan(origAImg);
             } else if (code === 'B1b') {
               // B1b: Trailing backslash / br line break doubles in round 2

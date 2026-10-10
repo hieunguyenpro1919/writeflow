@@ -6,7 +6,7 @@ import Paragraph from '@tiptap/extension-paragraph';
 import HardBreak from '@tiptap/extension-hard-break';
 import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
-import type { AnyExtension } from '@tiptap/core';
+import { Node, type AnyExtension } from '@tiptap/core';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Blockquote from '@tiptap/extension-blockquote';
 import {
@@ -313,6 +313,55 @@ export const CustomImage = Image.extend({
 });
 
 /**
+ * RawInlineNode preserves link-wrapped images [![badge](img)](url) (B2)
+ * and HTML <a href><img ...></a> (B6) verbatim without dropping links or mangling attributes.
+ */
+export const RawInlineNode = Node.create({
+  name: 'rawInlineNode',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  addAttributes: () => ({ content: { default: '' } }),
+  parseHTML: () => [
+    {
+      tag: 'span[data-raw-inline-node]',
+      getAttrs: (el) => ({
+        content:
+          (el as HTMLElement).getAttribute('data-raw-content') ||
+          (el as HTMLElement).textContent ||
+          '',
+      }),
+    },
+  ],
+  renderHTML: ({ node }) => [
+    'span',
+    { 'data-raw-inline-node': '', 'data-raw-content': node.attrs.content },
+    node.attrs.content,
+  ],
+  markdownTokenizer: {
+    name: 'rawInlineNode',
+    level: 'inline',
+    start(src: string): number {
+      const i1 = src.indexOf('[');
+      const i2 = src.indexOf('<a');
+      return i1 === -1 ? i2 : i2 === -1 ? i1 : Math.min(i1, i2);
+    },
+    tokenize(src: string) {
+      const b2 = /^\[([^[\]]*!\[[^\]]*\]\([^)]+\)[^[\]]*)\]\(([^)]+)\)/.exec(src);
+      if (b2) return { type: 'rawInlineNode', raw: b2[0], text: b2[0] };
+      const b6 = /^<a\s+[^>]*href=[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/i.exec(src);
+      return b6 ? { type: 'rawInlineNode', raw: b6[0], text: b6[0] } : undefined;
+    },
+  },
+  markdownTokenName: 'rawInlineNode',
+  parseMarkdown: (token) => ({
+    type: 'rawInlineNode',
+    attrs: { content: (token.raw ?? token.text ?? '').toString() },
+  }),
+  renderMarkdown: (node) => node.attrs?.content || '',
+});
+
+/**
  * Creates the official extensions for WriteFlow Markdown Engine (Phase 2).
  * Supports standard GFM and CommonMark block & inline structures:
  * - Nested bullet and ordered lists
@@ -327,6 +376,7 @@ export const CustomImage = Image.extend({
  * - Images with alt, src, title (![alt](url "title"))
  * - Extended attribute preservation for <a> and <img>
  * - Raw HTML, Tables, Footnotes, Reference definitions, Math blocks (RawBlock & RawInline)
+ * - RawInlineNode for link-wrapped badges (B2) and HTML <a><img></a> (B6)
  */
 export function createMarkdownEngineExtensions(): AnyExtension[] {
   return [
@@ -365,5 +415,6 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     RawDefExtension,
     RawMathExtension,
     RawInlineExtension,
+    RawInlineNode,
   ];
 }
