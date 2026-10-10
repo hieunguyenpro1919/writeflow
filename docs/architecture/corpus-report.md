@@ -1,9 +1,11 @@
-# BÁO CÁO PHÂN LOẠI ROUND-TRIP CORPUS 30 FILE (TASK 2.5b)
+# BÁO CÁO PHÂN LOẠI ROUND-TRIP CORPUS 52 FILE (TASK 2.5b-fix)
 
 **Dự án:** WriteFlow — Trình soạn thảo Markdown WYSIWYG  
-**Thời gian thực hiện:** 07/10/2026  
+**Thời gian thực hiện:** 10/10/2026  
 **Nhánh:** `phase-2`  
-**Quy tắc:** Đánh giá tính toàn vẹn và mức độ bảo toàn dữ liệu trên 30 file Markdown đa dạng (GFM, Tech Docs, HTML thô, Ca biên Unicode/Encoding) mà TUYỆT ĐỐI KHÔNG can thiệp sửa engine `src/`.
+**Commit `src/` tại thời điểm đo:** `6558bd24ae4406592fd6a447cbeb2d20c02d5e96`  
+**Môi trường thực thi:** Vitest v3.2.7 (Node v24.17.0, JSDOM test runner environment)  
+**Quy tắc kỷ luật:** TUYỆT ĐỐI KHÔNG can thiệp sửa engine trong `src/`. Mọi lỗi phát sinh chỉ ghi nhận vào báo cáo và quản lý qua `knownFailures` trong test suite.
 
 ---
 
@@ -11,16 +13,19 @@
 
 | Tiêu chí | Số lượng | Tỷ lệ (%) | Đánh giá |
 | :--- | :--- | :--- | :--- |
-| **Tổng số file đo kiểm** | **30 file** | 100.0% | Đạt chuẩn dung lượng mẫu |
-| **Đạt sạch 100% Byte-Exact (CLEAN)** | **13 file** | 43.3% | Tuyệt đối không lệch 1 byte |
-| **Nhóm 2: Khác biệt chuẩn hóa (Giữ nguyên ngữ nghĩa)** | **13 file** | 43.3% | Ngữ nghĩa tương đương, thỏa mãn CommonMark/GFM |
-| **Nhóm 3: Không Idempotent (`s2 !== s1`)** | **1 file** | 3.3% | Ghi nhận nợ kỹ thuật TD-12 |
-| **Nhóm 1: Sai lệch / Thoát Inline HTML (Chặn Gate A)** | **3 file** | 10.0% | Ghi nhận nợ kỹ thuật TD-11 |
+| **Tổng số file đo kiểm** | **52 file** | 100.0% | Vượt yêu cầu tối thiểu (≥ 30 file) |
+| **Số tài liệu thật (Repo + Open Source)** | **21 file** | 40.4% | Vượt yêu cầu tối thiểu (≥ 20 file) |
+| **Đạt sạch 100% Byte-Exact (CLEAN)** | **14 file** | 26.9% | Tuyệt đối không lệch 1 byte |
+| **Nhóm 2: Chuẩn hóa bảo toàn ngữ nghĩa (Idempotent)** | **28 file** | 53.8% | Ngữ nghĩa tương đương, thỏa mãn CommonMark/GFM |
+| **Nhóm 3: Dị biệt tính bất biến (`s2 !== s1`)** | **5 file** | 9.6% | Ghi nhận nợ kỹ thuật TD-10, TD-11, TD-13 |
+| **Nhóm 1: Sai lệch / Mất thẻ HTML nội dòng (Chặn Gate A)** | **5 file** | 9.6% | Ghi nhận nợ kỹ thuật TD-11, TD-12 |
 | **Crash / Exception khi Parse - Serialize** | **0 file** | 0.0% | 100% không crash |
 
 ---
 
-## 2. BẢNG PHÂN LOẠI CHI TIẾT TỪNG FILE CORPUS
+## 2. BẢNG PHÂN LOẠI CHI TIẾT TOÀN BỘ 52 FILE CORPUS
+
+### A. 30 file mẫu tổng hợp & ca biên gốc (`corpus/`)
 
 | STT | Tên file | Kích thước gốc | S1 / S2 | Phân nhóm | Kết quả & Ghi chú khác biệt |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -34,15 +39,15 @@
 | 08 | `08-tech-blockquote-mixed.md` | 1,111 B | 1,111 B / 1,111 B | **CLEAN** | Khớp byte 100%, blockquote đơn và lồng nhau kèm list/code. |
 | 09 | `09-tech-api-doc.md` | 2,044 B | 2,044 B / 2,044 B | **CLEAN** | Khớp byte 100%, tài liệu API thực tế với bảng, tham số, curl. |
 | 10 | `10-tech-changelog.md` | 1,270 B | 1,278 B / 1,278 B | **Nhóm 2** | Bare URL autolinked thành `[url](url)`. Idempotent. |
-| 11 | `11-html-block-basic.md` | 1,467 B | 1,467 B / 1,467 B | **CLEAN** | Khớp byte 100%, `<div>`, `<video>`, `<iframe>`, `<details>` giữ nguyên vẹn qua `rawBlock`. |
-| 12 | `12-html-inline-tags.md` | 1,427 B | 1,757 B / 1,757 B | **Nhóm 1** | `<abbr>`, `<b>`, `<code>`, `<kbd>` nội dòng bị escape thành `&lt;...&gt;` (**TD-11**). |
-| 13 | `13-html-link-img-extended.md` | 1,771 B | 1,834 B / 2,019 B | **Nhóm 3** | Thẻ `<a target="_blank">` chứa bare URL bị nhân bản link token ở vòng 2 (**TD-12**). |
-| 14 | `14-html-mixed-raw.md` | 1,269 B | 1,367 B / 1,367 B | **Nhóm 1** | Inline HTML trong văn bản Markdown hỗn hợp bị escape (`&lt;a&gt;`) (**TD-11**). |
+| 11 | `11-html-block-basic.md` | 1,467 B | 1,467 B / 1,467 B | **CLEAN** | Khớp byte 100%, `<div>`, `<details>`, `<table>` giữ nguyên vẹn qua `rawBlock`. |
+| 12 | `12-html-inline-tags.md` | 1,427 B | 1,757 B / 1,760 B | **Nhóm 3** | Thẻ inline HTML thiếu `rawInline` gây biến dạng re-serialize không ổn định (**TD-11**). |
+| 13 | `13-html-link-img-extended.md` | 1,771 B | 1,708 B / 1,708 B | **Nhóm 1** | Thẻ `<a>` mở rộng có `target`, `rel`, `class` bị convert thành link Markdown đơn giản làm mất thuộc tính (**TD-12**). |
+| 14 | `14-html-mixed-raw.md` | 1,269 B | 1,245 B / 1,245 B | **Nhóm 1** | Thẻ inline HTML (`<a>`, `<em>`, `<mark>`) trong khối hỗn hợp bị mất thẻ (**TD-11**). |
 | 15 | `15-html-frontmatter-yaml.md` | 1,673 B | 1,673 B / 1,673 B | **CLEAN** | Khớp byte 100%, YAML frontmatter bảo toàn nguyên vẹn 100%. |
 | 16 | `16-html-footnotes.md` | 1,221 B | 1,221 B / 1,221 B | **Nhóm 2** | Entity mã hóa khoảng trắng cho footnote reference text. Idempotent. |
 | 17 | `17-html-math-blocks.md` | 1,357 B | 1,384 B / 1,384 B | **Nhóm 2** | Khối LaTeX Math `$$` chuẩn hóa dòng phân cách. Idempotent. |
 | 18 | `18-html-reference-links.md` | 1,544 B | 1,870 B / 1,870 B | **Nhóm 2** | Reference links (`[text][id]`) chuyển thành inline links (`[text](url)`). Idempotent. |
-| 19 | `19-html-frontmatter-math-mix.md` | 1,407 B | 1,506 B / 1,506 B | **Nhóm 1** | Frontmatter + Math giữ nguyên, nhưng thẻ `<kbd>` nội dòng bị escape (**TD-11**). |
+| 19 | `19-html-frontmatter-math-mix.md` | 1,407 B | 1,506 B / 1,506 B | **Nhóm 2** | Frontmatter, Math, Div, Details, và inline kbd được bảo toàn trong JSDOM. Idempotent. |
 | 20 | `20-html-full-doc.md` | 1,900 B | 1,904 B / 1,904 B | **Nhóm 2** | Dòng ngắt và chuẩn hóa ký tự thoát CommonMark. Idempotent. |
 | 21 | `21-edge-vietnamese-full.md` | 2,947 B | 2,947 B / 2,947 B | **CLEAN** | Khớp byte 100%, tiếng Việt 134 ký tự có dấu, ca dao, thơ lục bát. |
 | 22 | `22-edge-vietnamese-nfc.md` | 904 B | 905 B / 905 B | **Nhóm 2** | Giữ nguyên chuẩn Unicode NFC tiếng Việt; chuẩn hóa newline cuối file. Idempotent. |
@@ -57,41 +62,71 @@
 
 ---
 
-## 3. PHÂN TÍCH CHI TIẾT CÁC NHÓM BIẾN ĐỔI
+### B. 22 file tài liệu thật (`corpus/real/`)
 
-### Nhóm 2: Khác biệt chuẩn hóa bảo toàn ngữ nghĩa (13 file)
-Các biến đổi sau đây được xác nhận là hành vi chuẩn hóa canonical của Markdown Engine, không làm thay đổi ngữ nghĩa hiển thị và đạt tính bất biến (Idempotent 100%):
-1. **Autolink chuyển thành explicit link format (3 file):** `10`, `18`, `27`.
-   - Bare URL được bọc kén `[url](url)` hoặc autolink theo chuẩn CommonMark.
-2. **Reference-style link -> Inline link (1 file):** `18`.
-   - Chuyển đổi tham chiếu `[text][id]` về dạng `[text](url)` inline trực tiếp.
-3. **Thụt lề danh sách & chuẩn hóa dòng trống (3 file):** `03`, `07`, `20`.
-   - Chuẩn hóa thụt lề 2 khoảng trắng cho bullet list và dòng trống cách ly khối mã 4 backticks.
-4. **Chuẩn hóa ngắt dòng & Trailing newline (4 file):** `22`, `23`, `25`, `26`.
-   - Thêm dòng trống cuối file theo chuẩn POSIX/CommonMark; đồng nhất CRLF cho file có hỗn hợp ngắt dòng.
-5. **Escape ký tự cú pháp đầu dòng (1 file):** `27`.
-   - Ký tự `#`, `1.`, `-` ở đầu dòng văn bản thường được escape dấu `\` để ngăn biến dạng thành cấu trúc khối khi mở lại.
-6. **File chỉ chứa dòng trống (1 file):** `29`.
-   - Rút gọn 5 byte dòng trống về 0 byte canonical rỗng.
-
-### Nhóm 3: Dị biệt tính bất biến (Non-Idempotent) (1 file)
-- **File:** `13-html-link-img-extended.md`
-- **Hiện tượng:** Serializer lần 1 sinh ra chuỗi có kích thước 1,834 B; Serializer lần 2 sinh ra chuỗi có kích thước 2,019 B (`s2 !== s1`).
-- **Nguyên nhân gốc:** Thẻ `<a href="..." target="_blank">` chứa nội dung text là URL trần bị cơ chế autolinker nhận diện và bọc thêm dấu ngoặc vuông `[ ]` trong vòng parse thứ 2, dẫn đến việc token link bị lặp lại.
-- **Mã theo dõi:** **TD-12** (Đã ghi vào sổ nợ kỹ thuật).
-
-### Nhóm 1: Sai lệch / Thoát Inline HTML (3 file - Lỗi CHẶN Gate A)
-- **Các file:** `12-html-inline-tags.md`, `14-html-mixed-raw.md`, `19-html-frontmatter-math-mix.md`.
-- **Hiện tượng:** Các thẻ HTML nội dòng (`<abbr>`, `<b>`, `<code>`, `<kbd>`) nằm xen kẽ trong đoạn văn bản thông thường bị ProseMirror schema bóc tách hoặc Serializer escape thành chuỗi thực thể `&lt;abbr&gt;`, `&lt;b&gt;`, `&lt;kbd&gt;`.
-- **Đánh giá mức độ:** Lỗi nghiêm trọng (Data Loss / Semantic Mutation).
-- **Mã theo dõi:** **TD-11** (Đã ghi vào sổ nợ kỹ thuật, bắt buộc xử lý qua Task Card riêng trước khi nghiệm thu Gate A).
+| STT | Tên file | Kích thước gốc | S1 / S2 | Phân nhóm | Kết quả & Ghi chú khác biệt |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 31 | `real/edge-line-120kb.md` | 124,256 B | 124,256 B / 124,256 B | **CLEAN** | **Dòng văn bản 124 KB giữ nguyên 100% byte**, không tràn bộ nhớ, không ngắt dòng sai. |
+| 32 | `real/oss-commonmark-spec-sample.md` | 961 B | 1,100 B / 1,100 B | **Nhóm 2** | Reference links chuyển thành inline links, bảo toàn footnote. Idempotent. |
+| 33 | `real/oss-electron-readme.md` | 892 B | 806 B / 806 B | **Nhóm 2** | Reference links và ảnh lồng link được serialize ổn định. Idempotent. |
+| 34 | `real/oss-express-readme.md` | 1,193 B | 1,071 B / 1,071 B | **Nhóm 2** | Badges CI Shields.io, code blocks, autolinks giữ nguyên. Idempotent. |
+| 35 | `real/oss-github-cheatsheet.md` | 853 B | 855 B / 855 B | **Nhóm 1** | Thẻ `<mark>`, `<abbr>`, `<sub>`, `<sup>` nội dòng bị bóc tách mất thẻ (**TD-11**). |
+| 36 | `real/oss-jest-guide.md` | 893 B | 902 B / 917 B | **Nhóm 3** | Danh sách số lồng khối mã bị thụt lề 3-space của serializer làm unindent ở vòng 2 (**TD-10**). |
+| 37 | `real/oss-katex-readme.md` | 889 B | 845 B / 845 B | **Nhóm 1** | Thẻ `<sup>`, `<sub>` bị bóc tách mất thẻ (**TD-11**). Idempotent. |
+| 38 | `real/oss-prettier-readme.md` | 1,068 B | 940 B / 940 B | **Nhóm 2** | Bảng Markdown và badges giữ nguyên vẹn, chuẩn hóa autolinks. Idempotent. |
+| 39 | `real/oss-react-tutorial.md` | 1,054 B | 1,063 B / 1,076 B | **Nhóm 3** | Danh sách số lồng khối mã `tsx` bị unindent ở vòng 2 do 3-space indent (**TD-10**). |
+| 40 | `real/oss-redux-readme.md` | 1,223 B | 1,173 B / 1,173 B | **Nhóm 1** | Thẻ `<mark>`, `<sub>`, `<sup>`, `<abbr>` bị mất thẻ (**TD-11**). Idempotent. |
+| 41 | `real/oss-rust-cli-guide.md` | 816 B | 830 B / 843 B | **Nhóm 3** | Danh sách số lồng khối mã Rust bị unindent ở vòng 2 (**TD-10**). |
+| 42 | `real/oss-vite-guide.md` | 1,152 B | 1,055 B / 1,055 B | **Nhóm 2** | Logo ảnh lồng link, bảng cấu hình 4 cột giữ nguyên vẹn. Idempotent. |
+| 43 | `real/oss-zustand-readme.md` | 1,444 B | 1,317 B / 1,317 B | **Nhóm 2** | TypeScript generic code fences, badges SVG giữ nguyên. Idempotent. |
+| 44 | `real/repo-agents.md` | 1,691 B | 1,692 B / 1,692 B | **Nhóm 2** | Chuẩn hóa trailing newline cuối file. Idempotent. |
+| 45 | `real/repo-markdown-normalizations.md` | 7,801 B | 7,873 B / 7,876 B | **Nhóm 3** | Code span chứa chuỗi thoát `\~~~` bị escape thêm backtick ở vòng 2 (**TD-13**). |
+| 46 | `real/repo-plan.md` | 79,234 B | 79,252 B / 79,252 B | **Nhóm 2** | **File kế hoạch 79 KB** bảo toàn 100% bảng, code, task lists. Idempotent. |
+| 47 | `real/repo-qa-manual.md` | 9,393 B | 9,211 B / 9,211 B | **Nhóm 2** | Chuẩn hóa `_italic_` thành `*italic*`, bảo toàn bảng test case. Idempotent. |
+| 48 | `real/repo-readme.md` | 3,177 B | 3,111 B / 3,111 B | **Nhóm 2** | Chuẩn hóa link tham chiếu thành link trực tiếp, giữ nguyên badges. Idempotent. |
+| 49 | `real/repo-tasks-phase-1.md` | 38,348 B | 38,491 B / 38,491 B | **Nhóm 2** | **File 38 KB** bảo toàn toàn bộ checklist, task matrices. Idempotent. |
+| 50 | `real/repo-tasks-phase-2.md` | 3,116 B | 3,141 B / 3,141 B | **Nhóm 2** | Chuẩn hóa dòng ngắt cứng thành `\`. Idempotent. |
+| 51 | `real/repo-technical-debt.md` | 13,067 B | 13,088 B / 13,088 B | **Nhóm 2** | Bảo toàn toàn bộ bảng theo dõi nợ TD-01→TD-12 và chuỗi JSON. Idempotent. |
+| 52 | `real/repo-versions.md` | 3,432 B | 3,434 B / 3,434 B | **Nhóm 2** | Bảng phụ thuộc npm giữ nguyên vẹn 100%. Idempotent. |
 
 ---
 
-## 4. KẾT LUẬN & KIẾN NGHỊ
+## 3. PHÂN TÍCH CHUYÊN SÂU CÁC NHÓM BIẾN ĐỔI
 
-1. **Hiệu năng và độ tin cậy nền tảng:**
-   - Markdown Engine đã đạt **100% không crash** trên toàn bộ 30 file corpus phức tạp (kể cả Unicode NFD/NFC, UTF-8 BOM, file rỗng, và dòng siêu dài 11 kB).
-   - Tỷ lệ hoàn toàn bảo toàn (Clean + Nhóm 2) đạt **86.6%** (26/30 file).
-2. **Kế hoạch xử lý tiếp theo:**
-   - Đưa **TD-11** (Hỗ trợ `rawInline` cho inline HTML tags) và **TD-12** (Bảo toàn link HTML mở rộng) vào Task Card 2.6 (hoặc task sửa lỗi chuyên biệt) để giải quyết dứt điểm trước khi đóng Phase 2.
+### Nhóm 2: Khác biệt chuẩn hóa bảo toàn ngữ nghĩa (28 file)
+Chiếm đa số tuyệt đối (53.8%) và đạt **tính bất biến (Idempotent 100%)**:
+1. **Chuyển đổi Reference links sang Inline links:** Phổ biến trên các file README chuẩn OSS (`oss-electron-readme.md`, `oss-commonmark-spec-sample.md`, `repo-readme.md`, `18-html-reference-links.md`). Dữ liệu URL và text đích được giữ nguyên vẹn 100%.
+2. **Chuẩn hóa thụt lề danh sách lồng & dòng trống:** Thụt lề 2 khoảng trắng canonical cho danh sách con và chèn dòng trống phân cách quanh khối mã.
+3. **Thoát ký tự đầu dòng văn bản thường:** `#`, `1.`, `-` ở đầu dòng được bảo vệ bằng dấu `\` để không bị biến thành block node.
+4. **Chuẩn hóa EOL & Trailing newline:** Tự động phát hiện CRLF/LF và bổ sung ký tự ngắt dòng cuối file chuẩn POSIX.
+
+### Nhóm 3: Dị biệt tính bất biến (`s2 !== s1` — 5 file)
+1. **TD-10 (Danh sách số lồng khối mã):**
+   - Các file: `oss-jest-guide.md`, `oss-react-tutorial.md`, `oss-rust-cli-guide.md`.
+   - Hiện tượng: Vòng 1 serialize khối mã trong ordered list bằng 3 dấu cách (`   ``` `). CommonMark yêu cầu continuation indent là 4 dấu cách, nên marked ở vòng 2 tách khối mã ra khỏi ordered list (`s2 !== s1`).
+2. **TD-13 (Ký tự phân cách code span):**
+   - File: `repo-markdown-normalizations.md`.
+   - Hiện tượng: Ký tự dấu ngã thoát trong code span (`\~~~`) bị serializer bọc thêm backtick và escape trên serialize lần 2.
+3. **TD-11 (Inline HTML unstable):**
+   - File: `12-html-inline-tags.md`.
+
+### Nhóm 1: Sai lệch / Mất thẻ HTML nội dòng (5 file — Lỗi CHẶN Gate A)
+1. **TD-11 (Mất thẻ inline HTML):**
+   - Các file: `14-html-mixed-raw.md`, `oss-github-cheatsheet.md`, `oss-katex-readme.md`, `oss-redux-readme.md`.
+   - Hiện tượng: Các thẻ `<mark>`, `<sub>`, `<sup>`, `<abbr>` do ProseMirror schema hiện tại chưa có extension `rawInline` nên bị DOMParser bóc tách (chỉ giữ lại text bên trong, ví dụ `H<sub>2</sub>O` thành `H2O`).
+2. **TD-12 (Mất thuộc tính mở rộng của anchor/image HTML):**
+   - File: `13-html-link-img-extended.md`.
+   - Hiện tượng: Thẻ `<a target="_blank" rel="..." class="...">` bị chuyển thành markdown link `[text](url)` thông thường, mất các thuộc tính HTML tùy biến.
+
+---
+
+## 4. KẾT LUẬN & KIẾN NGHỊ CHO GATE A
+
+1. **Độ ổn định trên tài liệu thực tế đồ sộ:**
+   - Đã kiểm thử thành công trên các tài liệu lớn của repo (`docs/PLAN.md` 79 KB, `phase-1.md` 38 KB) và file hiệu năng cực hạn 124 KB (1 dòng).
+   - Tỷ lệ bảo toàn ngữ nghĩa (Clean + Nhóm 2) đạt **80.8%** (42/52 file).
+   - Tỷ lệ không crash đạt **100.0%**.
+2. **Nhiệm vụ trọng tâm trước khi đóng Gate A (Phase 2):**
+   - Cần 1 Task Card riêng (Task 2.6) để triển khai **`rawInline`** nhằm giải quyết triệt để **TD-11** và **TD-12**.
+   - Cập nhật quy tắc thụt lề 4 dấu cách cho ordered list continuation để xử lý **TD-10**.
+   - Tất cả 10 file lỗi đã được cô lập và khẳng định chủ động trong `knownFailures` của test suite `tests/unit/markdown/corpus.test.ts`. Khi sửa xong các TD trên, các test này sẽ tự động báo đỏ để buộc gỡ khỏi danh sách nợ.

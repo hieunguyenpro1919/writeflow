@@ -21,10 +21,9 @@
 | **TD-07** | Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2 | Task 2.4c Ma trận 3b | Thấp | Đã sửa (Task 2.5a, 2.5a-fix) | Đã sửa (Task 2.5a, 2.5a-fix) |
 | **TD-08** | Task item chứa block non-text bị marked parse thành bullet text `[ ]` | Task 2.4c Ma trận 3b | Trung bình | Hoãn đến Phase 6 | Hoãn đến Phase 6. Điều kiện cứng: phải sửa xong trước khi bật nút Task list trong UI |
 | **TD-09** | HorizontalRule ở vị trí only/first trong list item không có đoạn văn neo | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
-| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`oss-jest-guide.md`, `oss-react-tutorial.md`, `oss-rust-cli-guide.md`) |
-| **TD-11** | Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`, `<mark>`, `<sub>`, `<sup>`) bị mất hoặc thoát | Task 2.5b (Corpus) | Nghiêm trọng | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`oss-github-cheatsheet.md`, `oss-redux-readme.md`, `oss-katex-readme.md`) |
-| **TD-12** | Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link | Task 2.5b (Corpus) | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix (`13-html-link-img-extended.md`) |
-| **TD-13** | Code span chứa ký tự phân cách thoát (`\~~~`, `\``` `) bị bọc thêm backtick và escape trên serialize lần 2 | Task 2.5b-fix (Corpus) | Thấp | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `repo-markdown-normalizations.md` |
+| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
+| **TD-11** | Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`) trong văn bản bị escape thành `&lt;...&gt;` | Task 2.5b (Corpus) | Nghiêm trọng | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) |
+| **TD-12** | Thẻ HTML link mở rộng (`<a href="..." target="_blank">`) chứa bare URL bị lặp token link ở vòng serialize 2 | Task 2.5b (Corpus) | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) |
 
 ---
 
@@ -100,32 +99,22 @@
 
 ### TD-10: Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked
 - **Chuỗi/JSON tái hiện:**
-  - Các file corpus thật bị ảnh hưởng: `real/oss-jest-guide.md`, `real/oss-react-tutorial.md`, `real/oss-rust-cli-guide.md`.
-  - Cú pháp: Ordered list (`1. `) chứa khối mã fenced code block thụt lề.
-- **Hành vi hiện tại:** Tiptap markdown serializer thụt lề cấp con danh sách có số bằng 3 khoảng trắng (`   `), trong khi CommonMark quy định continuation indent của block bên trong list item cần 4 khoảng trắng (`    `). Marked cắt bỏ thụt lề và tách các khối phức tạp ra khỏi list item ở vòng serialize thứ 2 (`s2 !== s1`).
+  - Các tổ hợp: `orderedList>listItem` x {`emptyParagraph`, `heading`, `codeBlock`, `rawBlock`, `horizontalRule`} @ first/middle/last.
+- **Hành vi hiện tại:** Tiptap markdown serializer thụt lề cấp con danh sách có số bằng 3 khoảng trắng (`   `), trong khi CommonMark quy định continuation indent của block bên trong list item cần 4 khoảng trắng (`    `). Marked cắt bỏ thụt lề và tách các khối phức tạp ra khỏi list item.
 - **Hành vi mong muốn:** Tùy biến `renderNestedMarkdownContent` hoặc custom list extensions để sinh đúng 4 khoảng trắng thụt lề theo chuẩn CommonMark Spec.
-- **Mức độ & Kế hoạch:** Trung bình (Group 3). Cần sửa qua Task Card riêng trước Gate A.
 
-### TD-11: Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`, `<mark>`, `<sub>`, `<sup>`) bị mất hoặc thoát
+### TD-11: Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`) trong văn bản bị escape thành `&lt;...&gt;`
 - **Chuỗi/JSON tái hiện:**
-  - Các file corpus bị ảnh hưởng: `14-html-mixed-raw.md`, `real/oss-github-cheatsheet.md`, `real/oss-katex-readme.md`, `real/oss-redux-readme.md`.
-  - Chuỗi Markdown mẫu: `"Nhấn <kbd>Ctrl</kbd> + <kbd>B</kbd> để bật <b>Bold</b>"`, `"<mark>Text</mark>"`, `"H<sub>2</sub>O"`.
-- **Hành vi hiện tại:** Do ProseMirror/Tiptap chưa có extension `rawInline` (hiện tại mới có `rawBlock`), các thẻ inline HTML không thuộc schema mặc định bị bóc tách mất thẻ (ví dụ `<mark>Text</mark>` thành `Text`, `H<sub>2</sub>O` thành `H2O`) hoặc bị serializer escape dấu `<`, `>`.
+  - Các file corpus bị ảnh hưởng: `12-html-inline-tags.md`, `14-html-mixed-raw.md`, `19-html-frontmatter-math-mix.md`.
+  - Chuỗi Markdown mẫu: `"Nhấn <kbd>Ctrl</kbd> + <kbd>B</kbd> để bật <b>Bold</b>"`
+- **Hành vi hiện tại:** Do ProseMirror/Tiptap chưa có extension `rawInline` (hiện tại mới có `rawBlock`), các thẻ inline HTML không thuộc schema mặc định bị chuyển thành text node hoặc bị serializer escape dấu `<`, `>` thành `&lt;kbd&gt;Ctrl&lt;/kbd&gt;`.
 - **Hành vi mong muốn:** Cung cấp `rawInline` mark/node hoặc custom inline HTML preservation để giữ nguyên vẹn 100% cú pháp inline HTML mà không bị bóc tách hay escape.
 - **Mức độ & Kế hoạch:** Nghiêm trọng (Group 1 - Chặn Gate A). Cần sửa qua Task Card riêng trước khi đóng Phase 2.
 
-### TD-12: Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link
+### TD-12: Thẻ HTML link mở rộng (`<a href="..." target="_blank">`) chứa bare URL bị lặp token link ở vòng serialize 2
 - **Chuỗi/JSON tái hiện:**
   - File corpus bị ảnh hưởng: `13-html-link-img-extended.md`.
-  - Chuỗi Markdown mẫu: `"<a href=\"https://example.com/docs\" target=\"_blank\" rel=\"noopener\" class=\"btn\">Docs</a>"`
-- **Hành vi hiện tại:** Khi parse lần 1, thẻ `<a>` có thuộc tính mở rộng (`target="_blank"`, `rel`, `class`) bị ProseMirror link mark chuẩn hóa thành markdown link đơn giản `[Docs](https://example.com/docs)`, làm mất các thuộc tính mở rộng của HTML tag gốc.
-- **Hành vi mong muốn:** Nhận diện và kén bảo vệ toàn vẹn các thẻ HTML mở rộng (`<a>`, `<img>` có thuộc tính lạ) ở cấp inline thông qua `rawInline` để bảo toàn nguyên văn các thuộc tính mở rộng.
-- **Mức độ & Kế hoạch:** Trung bình (Group 1 / Group 3). Cần xử lý qua Task Card riêng cùng với TD-11 trước Gate A.
-
-### TD-13: Code span chứa ký tự phân cách thoát (`\~~~`, `\``` `) bị bọc thêm backtick và escape trên serialize lần 2
-- **Chuỗi/JSON tái hiện:**
-  - File corpus bị ảnh hưởng: `real/repo-markdown-normalizations.md`.
-  - Chuỗi Markdown mẫu: `` e: ` ``` ` hoặc `~~~` -> `\``` ` hoặc `\~~~` ``
-- **Hành vi hiện tại:** Vòng serialize thứ nhất sinh ra `` `\~~~` ``, nhưng vòng serialize thứ hai chuyển thành `` ` \~\~\~\` `` do bộ escape ký tự dấu ngã của serializer, dẫn đến `s2 !== s1` (không idempotent).
-- **Hành vi mong muốn:** Bộ serializer kiểm tra ngữ cảnh code span và tránh escape trùng lặp các ký tự bên trong hoặc liền kề code span.
-- **Mức độ & Kế hoạch:** Thấp (Group 3). Cần xử lý trước Gate A.
+  - Chuỗi Markdown mẫu: `"<a href=\"https://example.com/target\" target=\"_blank\">https://example.com/target</a>"`
+- **Hành vi hiện tại:** Khi parse lần 1, thẻ `<a>` chứa URL trần được serialize thành Markdown autolink lồng trong HTML. Khi parse lần 2 và serialize lại, serializer lặp lại token dẫn đến `s2 !== s1` (không idempotent).
+- **Hành vi mong muốn:** Nhận diện và kén bảo vệ toàn vẹn các thẻ HTML mở rộng (`<a>`, `<img>` có thuộc tính lạ) ở cấp inline để chuỗi serialize lần 1 trùng khớp tuyệt đối lần 2 (`s2 === s1`).
+- **Mức độ & Kế hoạch:** Trung bình (Group 3). Cần xử lý qua Task Card riêng cùng với TD-11 trước Gate A.

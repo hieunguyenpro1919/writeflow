@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { marked, type Token, type Tokens } from 'marked';
-import { parse } from '../src/core/markdown/parser';
+import { extractFrontmatter, parse } from '../src/core/markdown/parser';
 import { serialize } from '../src/core/markdown/serializer';
 
 export interface FileReport {
@@ -22,13 +22,15 @@ export interface FileReport {
     codeBlocksMismatch: boolean;
     tablesMismatch: boolean;
     htmlMismatch: boolean;
+    frontmatterMismatch: boolean;
     details: string[];
   };
   group: 1 | 2 | 3 | 'CLEAN';
   differences: string[];
 }
 
-interface Inventory {
+export interface Inventory {
+  frontmatter: string;
   words: string[];
   links: string[];
   images: string[];
@@ -37,9 +39,11 @@ interface Inventory {
   htmlBlocks: string[];
 }
 
-function extractInventory(md: string): Inventory {
-  const tokens = marked.lexer(md);
+export function extractInventory(md: string): Inventory {
+  const { frontmatter, body } = extractFrontmatter(md);
+  const tokens = marked.lexer(body);
   const inv: Inventory = {
+    frontmatter: frontmatter?.raw ?? '',
     words: [],
     links: [],
     images: [],
@@ -66,9 +70,9 @@ function extractInventory(md: string): Inventory {
       }
 
       if ('text' in t && typeof t.text === 'string' && t.type !== 'code' && t.type !== 'html') {
-        // Extract words (Vietnamese & Latin words)
+        // Extract words (Vietnamese & Latin words, excluding pure syntax characters and bare urls)
         const words = t.text
-          .replace(/[\\`*_[\]~#+\-><|]/g, ' ')
+          .replace(/[\\`*_[\]~#+\-><|()]/g, ' ')
           .split(/\s+/)
           .map((w: string) => w.trim().toLowerCase())
           .filter((w: string) => w.length > 0 && !w.startsWith('http') && !w.startsWith('www.'));
@@ -96,8 +100,11 @@ function extractInventory(md: string): Inventory {
   return inv;
 }
 
-function compareInventories(inv1: Inventory, inv2: Inventory) {
+export function compareInventories(inv1: Inventory, inv2: Inventory) {
   const details: string[] = [];
+
+  const fmMatch = inv1.frontmatter === inv2.frontmatter;
+  if (!fmMatch) details.push('Frontmatter mismatch');
 
   const codeMatch = JSON.stringify(inv1.codeBlocks) === JSON.stringify(inv2.codeBlocks);
   if (!codeMatch) details.push(`Code blocks mismatch (orig: ${inv1.codeBlocks.length}, s1: ${inv2.codeBlocks.length})`);
@@ -138,12 +145,27 @@ function compareInventories(inv1: Inventory, inv2: Inventory) {
     codeBlocksMismatch: !codeMatch,
     tablesMismatch: !tableMatch,
     htmlMismatch: !htmlMatch,
+    frontmatterMismatch: !fmMatch,
     details,
   };
 }
 
+export function getAllCorpusFiles(dir: string, baseDir = dir): string[] {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const result: string[] = [];
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      result.push(...getAllCorpusFiles(fullPath, baseDir));
+    } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'SOURCES.md') {
+      result.push(path.relative(baseDir, fullPath).replace(/\\/g, '/'));
+    }
+  }
+  return result.sort();
+}
+
 export function runCorpusEvaluation(corpusDir: string): FileReport[] {
-  const files = fs.readdirSync(corpusDir).filter((f) => f.endsWith('.md') && f !== 'SOURCES.md').sort();
+  const files = getAllCorpusFiles(corpusDir);
   const reports: FileReport[] = [];
 
   for (const filename of files) {
@@ -186,6 +208,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
       codeBlocksMismatch: false,
       tablesMismatch: false,
       htmlMismatch: false,
+      frontmatterMismatch: false,
       details: [] as string[],
     };
 
@@ -221,7 +244,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
       group = 'CLEAN';
     } else if (!isIdempotent) {
       group = 3;
-    } else if (invDiff.codeBlocksMismatch || invDiff.tablesMismatch || invDiff.htmlMismatch) {
+    } else if (invDiff.codeBlocksMismatch || invDiff.tablesMismatch || invDiff.htmlMismatch || invDiff.frontmatterMismatch) {
       group = 1; // Severe data loss
     } else {
       group = 2; // Non-byte exact but semantically preserved
@@ -252,7 +275,7 @@ if (import.meta.url.endsWith(process.argv[1]) || process.argv[1]?.includes('corp
   const reports = runCorpusEvaluation(corpusDir);
 
   console.log('='.repeat(80));
-  console.log('WRITEFLOW CORPUS ROUNDTRIP EVALUATION REPORT (30 FILES)');
+  console.log(`WRITEFLOW CORPUS ROUNDTRIP EVALUATION REPORT (${reports.length} FILES)`);
   console.log('='.repeat(80));
 
   let cleanCount = 0;
@@ -280,6 +303,6 @@ if (import.meta.url.endsWith(process.argv[1]) || process.argv[1]?.includes('corp
   }
 
   console.log('-'.repeat(80));
-  console.log(`TOTAL: ${reports.length} files | CLEAN (100% byte-match): ${cleanCount} | GROUP 2: ${g2Count} | GROUP 3: ${g3Count} | GROUP 1: ${g1Count}`);
+  console.log(`TOTAL: ${reports.length} files | CLEAN: ${cleanCount} | GROUP 2: ${g2Count} | GROUP 3: ${g3Count} | GROUP 1: ${g1Count}`);
   console.log('='.repeat(80));
 }
