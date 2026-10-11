@@ -55,6 +55,9 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - Dấu `_` và `*` trong chuỗi bắt đầu bằng `http://`, `https://` hoặc `www.` không bị escape.
   - Vào: `http://a.com/x_y`
   - Ra: `http://a.com/x_y`. Khi mở lại, trình phân tích tự nhận là liên kết (autolink GFM). Nội dung chữ không đổi nhưng được gắn mark liên kết (Hành vi chuẩn GFM).
+- **Phân cách giữa các định nghĩa tham chiếu liên tiếp (Task 2.5d Bước 0)**:
+  - Khi hai khối định nghĩa tham chiếu (`reference_def`) đứng liền kề nhau ở cấp gốc (root document), chúng được ngăn cách bằng 1 ký tự xuống dòng `\n` thay vì 2 ký tự xuống dòng `\n\n`.
+  - Giúp bảo toàn phong cách trình bày liên tiếp của các khối tham chiếu (ví dụ `express-readme.md`) tại điểm ghép khối AST mà không làm ảnh hưởng dòng trống trong các khối khác (code block, raw HTML, list).
 
 ## 5. Khối mã (Code Blocks) & Khối trích dẫn (Blockquotes)
 - **Fenced Code Blocks**:

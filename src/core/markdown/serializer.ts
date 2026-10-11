@@ -27,9 +27,6 @@ export function normalizeSerializedMarkdown(markdown: string): string {
   // 3. Keep opening bracket escaped for reference definitions at line-start: \[ref\]: -> \[ref]: (Task 2.4c Group D)
   result = result.replace(/^\\\[([^\]]+)\\\]:/gm, (_m, id) => `\\[${id}]:`);
 
-  // 4. Keep adjacent reference definitions unspaced (Task 2.5c-fix B2b)
-  result = result.replace(/^(\[[^\]]+\]:[^\n]+)\n\n(?=\[[^\]]+\]:)/gm, '$1\n');
-
   return result;
 }
 

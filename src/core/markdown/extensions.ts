@@ -1,4 +1,5 @@
 import StarterKit from '@tiptap/starter-kit';
+import { Document } from '@tiptap/extension-document';
 import Link from '@tiptap/extension-link';
 import CodeBlock from '@tiptap/extension-code-block';
 import Image from '@tiptap/extension-image';
@@ -381,6 +382,22 @@ export const RawInlineNode = Node.create({
  * - Raw HTML, Tables, Footnotes, Reference definitions, Math blocks (RawBlock & RawInline)
  * - RawInlineNode for link-wrapped badges (B2) and HTML <a><img></a> (B6)
  */
+/** Custom Document separates adjacent root reference definitions by \n (Task 2.5d Step 0). */
+export const CustomDocument = Document.extend({
+  renderMarkdown(node, h) {
+    return (node.content || []).reduce((acc, c, i) => {
+      const p = node.content![i - 1];
+      const isRef = (n: typeof c) => n?.type === 'rawBlock' && n?.attrs?.format === 'reference_def';
+      const isEnd =
+        c?.type === 'rawBlock' &&
+        c?.attrs?.format === 'html' &&
+        (c?.attrs?.content || '').startsWith('</');
+      const sep = i > 0 ? (isRef(p) && (isRef(c) || isEnd) ? '\n' : '\n\n') : '';
+      return acc + sep + (h.renderChild?.(c, i) ?? '');
+    }, '');
+  },
+});
+
 export function createMarkdownEngineExtensions(): AnyExtension[] {
   return [
     StarterKit.configure({
@@ -396,7 +413,9 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
       hardBreak: false,
       paragraph: false,
       blockquote: false,
+      document: false,
     }),
+    CustomDocument,
     CustomParagraph,
     CustomHardBreak,
     CustomHorizontalRule,

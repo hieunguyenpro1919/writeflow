@@ -30,6 +30,7 @@
 | **B1b** | Ngắt dòng cuối đoạn văn hoặc `<br>` để lại ký tự `\` gấp đôi thành `\\` trên vòng serialize thứ 2 | Upstream OSS (Task 2.5b-fix2) | Trung bình (Group 3) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `oss/lodash-readme.md`, `oss/mermaid-readme.md`, `synthetic/12-html-inline-tags.md` |
 | **B8** | GitHub callout alerts `> [!NOTE]` bị escape dấu ngoặc vuông thành `> \[!NOTE\]` | Upstream OSS (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `oss/axios-readme.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md` |
 | **N1** | Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;` | Upstream OSS & Repo (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên 14 file (`oss/awesome-readme.md`, `oss/express-history.md`, `oss/express-readme.md`, `oss/keep-a-changelog.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/redux-readme.md`, `real/repo-qa-manual.md`, `real/repo-readme.md`, `real/repo-tasks-phase-1.md`, `real/repo-tasks-phase-2.md`, `real/repo-versions.md`, `synthetic/27-edge-syntax-as-text.md`) |
+| **TD-14** | Code span chứa nguyên văn `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` bị đổi | Task 2.5d Bước 0 | Thấp | Chấp nhận có điều kiện | Chấp nhận (hiếm khi xảy ra trong văn bản thực tế, chấp nhận để phục hồi comment trong code span) |
 
 ---
 
@@ -174,3 +175,10 @@
 - **Hành vi hiện tại:** DOMParser chuyển ký tự `&` trong text thành `&amp;` hoặc serializer tự động sinh `&amp;` khi xuất ra Markdown.
 - **Hành vi mong muốn:** Ký tự `&` giữa dòng trong văn bản thuần Markdown không cần và không được mã hóa thành `&amp;` trừ khi là entity hợp lệ.
 - **Mức độ & Kế hoạch:** Thấp (Group 2). Cần xử lý qua Task Card riêng trước Gate A.
+
+### TD-14: Code span chứa nguyên văn `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` bị đổi
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown mẫu: `` `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` ``
+- **Hành vi hiện tại:** Để khôi phục comment inline trong code span (`<!-- x -->`), serializer thay thế chuỗi đại diện raw-inline thành comment thật trong node text mang mark `code`, dẫn tới việc nếu người dùng gõ nguyên văn thẻ span này trong code span thì nó sẽ bị đổi thành `<!-- x -->`.
+- **Hành vi mong muốn:** Nhận diện và phân biệt giữa span do engine sinh ra với chuỗi ký tự do người dùng nhập.
+- **Mức độ & Kế hoạch:** Thấp. Chấp nhận (trường hợp cực hiếm trong thực tế, chấp nhận có điều kiện).
