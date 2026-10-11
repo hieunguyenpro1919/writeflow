@@ -27,27 +27,42 @@ export function normalizeSerializedMarkdown(markdown: string): string {
   // 3. Keep opening bracket escaped for reference definitions at line-start: \[ref\]: -> \[ref]: (Task 2.4c Group D)
   result = result.replace(/^\\\[([^\]]+)\\\]:/gm, (_m, id) => `\\[${id}]:`);
 
-  // 4. Restore protected spaces inside code spans (B3)
-  result = result.replace(/\uE000/g, ' ');
-
-  // 5. Restore HTML comments inside code spans or table cells (B4)
-  result = result.replace(
-    /<span data-raw-inline="" data-raw-comment="true">&lt;!--([\s\S]*?)--&gt;<\/span>/g,
-    '<!--$1-->',
-  );
+  // 4. Keep adjacent reference definitions unspaced (Task 2.5c-fix B2b)
+  result = result.replace(/^(\[[^\]]+\]:[^\n]+)\n\n(?=\[[^\]]+\]:)/gm, '$1\n');
 
   return result;
 }
 
-function protectCodeSpaces(node: JSONContent): JSONContent {
+function findPlaceholder(docStr: string): string {
+  for (let cp = 0xe000; cp <= 0xf8ff; cp++) {
+    const ch = String.fromCharCode(cp);
+    if (!docStr.includes(ch)) return ch;
+  }
+  return '';
+}
+
+function sanitizeDocForSerialization(node: JSONContent, ph: string): JSONContent {
   if (!node) return node;
   if (node.type === 'text' && node.marks?.some((m) => m.type === 'code')) {
-    const text = node.text || '';
-    if (text.startsWith(' ') || text.endsWith(' ')) {
-      return { ...node, text: text.replace(/^ /, '\uE000').replace(/ $/, '\uE000') };
+    let text = (node.text || '').replace(
+      /<span data-raw-inline="" data-raw-comment="true">&lt;!--([\s\S]*?)--&gt;<\/span>/g,
+      '<!--$1-->',
+    );
+    if (ph && (text.startsWith(' ') || text.endsWith(' '))) {
+      text = text.replace(/^ /, ph).replace(/ $/, ph);
     }
+    return { ...node, text };
   }
-  if (Array.isArray(node.content)) return { ...node, content: node.content.map(protectCodeSpaces) };
+  if (node.type === 'rawBlock' && node.attrs?.format === 'table') {
+    const content = (node.attrs.content || '').replace(
+      /<span data-raw-inline="" data-raw-comment="true">&lt;!--([\s\S]*?)--&gt;<\/span>/g,
+      '<!--$1-->',
+    );
+    return { ...node, attrs: { ...node.attrs, content } };
+  }
+  if (Array.isArray(node.content)) {
+    return { ...node, content: node.content.map((c) => sanitizeDocForSerialization(c, ph)) };
+  }
   return node;
 }
 
@@ -60,11 +75,14 @@ export function serialize(
   frontmatter?: FrontmatterData,
   options?: MarkdownOptions,
 ): string {
-  const jsonContent: JSONContent = protectCodeSpaces(isProseMirrorNode(doc) ? doc.toJSON() : doc);
+  const rawJson: JSONContent = isProseMirrorNode(doc) ? doc.toJSON() : doc;
+  const ph = findPlaceholder(JSON.stringify(rawJson));
+  const jsonContent = sanitizeDocForSerialization(rawJson, ph);
   const manager = getSharedMarkdownManager();
 
   // 1. Serialize document body
   let bodyMarkdown = manager.serialize(jsonContent);
+  if (ph) bodyMarkdown = bodyMarkdown.replaceAll(ph, ' ');
   bodyMarkdown = normalizeSerializedMarkdown(bodyMarkdown);
 
   // 2. Format frontmatter header if present

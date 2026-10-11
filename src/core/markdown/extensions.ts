@@ -347,8 +347,11 @@ export const RawInlineNode = Node.create({
       return i1 === -1 ? i2 : i2 === -1 ? i1 : Math.min(i1, i2);
     },
     tokenize(src: string) {
-      const b2 = /^\[([^[\]]*!\[[^\]]*\]\([^)]+\)[^[\]]*)\]\(([^)]+)\)/.exec(src);
-      if (b2) return { type: 'rawInlineNode', raw: b2[0], text: b2[0] };
+      const b2 =
+        /^\[((?:[^[\]]|!\[[^\]]*\](?:\([^)]+\)|\[[^\]]*\]))+)\](?:\(([^)]+)\)|\[([^\]]*)\])/.exec(
+          src,
+        );
+      if (b2 && b2[1].includes('![')) return { type: 'rawInlineNode', raw: b2[0], text: b2[0] };
       const b6 = /^<a\s+[^>]*href=[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/i.exec(src);
       return b6 ? { type: 'rawInlineNode', raw: b6[0], text: b6[0] } : undefined;
     },

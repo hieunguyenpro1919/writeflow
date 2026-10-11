@@ -228,6 +228,17 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
         });
       }
 
+      if (!failureInfo) {
+        it('preserves resolved link and image URLs 100% (multiset check)', () => {
+          const p1 = parse(original);
+          const s1 = serialize(p1.doc, p1.frontmatter, options);
+          const invOrig = extractInventory(original);
+          const invS1 = extractInventory(s1);
+          expect(invS1.links).toEqual(invOrig.links);
+          expect(invS1.images).toEqual(invOrig.images);
+        });
+      }
+
       if (failureInfo) {
         it(`actively asserts known defect reproduction (${failureInfo.codes.join(', ')})`, () => {
           const p1 = parse(original);
