@@ -202,6 +202,8 @@ export const RawInlineExtension = Mark.create({
 
   priority: 1000,
 
+  excludes: '',
+
   code: true, // Crucial: sets codeTypes in MarkdownManager to disable entity escaping
 
   addAttributes() {
@@ -230,10 +232,16 @@ export const RawInlineExtension = Mark.create({
   parseHTML() {
     return [
       { tag: 'span[data-raw-comment]' },
-      { tag: 'span' },
-      { tag: 'kbd' },
-      { tag: 'b' },
-      { tag: 'code' },
+      {
+        tag: '*',
+        getAttrs: (element) => {
+          if (typeof element === 'string') return false;
+          const tag = (element as HTMLElement).tagName.toLowerCase();
+          const excluded =
+            /^(i|em|strong|del|s|strike|a|img|br|div|p|h[1-6]|ul|ol|li|blockquote|pre|hr|table|t[rhd]|tbody|thead|tfoot|colgroup|col|caption|section|article|aside|nav|header|footer|main|figure|figcaption|details|summary|dialog|html|head|body|script|style|meta|link|title)$/;
+          return excluded.test(tag) ? false : null;
+        },
+      },
     ];
   },
 

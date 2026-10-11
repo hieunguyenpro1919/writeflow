@@ -82,21 +82,32 @@ export const CustomParagraph = Paragraph.extend({
 
     const content = Array.isArray(node.content) ? node.content : [];
 
-    // Trim trailing hardBreak nodes at block boundary (Task 2.4c Group B)
-    let end = content.length;
-    while (end > 0 && content[end - 1]?.type === 'hardBreak') {
-      end--;
+    const cleaned: typeof content = [];
+    for (let i = 0; i < content.length; i++) {
+      const child = content[i];
+      if (child.type === 'text') {
+        const prev = cleaned[cleaned.length - 1];
+        let text = child.text || '';
+        if (prev?.type === 'hardBreak') text = text.replace(/^\n+/, '');
+        if (text) cleaned.push({ ...child, text });
+      } else {
+        cleaned.push(child);
+      }
     }
-    const trimmed = end < content.length ? content.slice(0, end) : content;
+    while (cleaned.length > 0) {
+      const last = cleaned[cleaned.length - 1];
+      if (last.type === 'hardBreak' || (last.type === 'text' && !last.text?.trim())) cleaned.pop();
+      else break;
+    }
 
-    if (trimmed.length === 0) {
+    if (cleaned.length === 0) {
       // Emit &nbsp; for consecutive empty paragraphs to preserve blank lines
       const prevContent = Array.isArray(ctx?.previousNode?.content) ? ctx.previousNode.content : [];
       const prevIsEmpty = ctx?.previousNode?.type === 'paragraph' && prevContent.length === 0;
       return prevIsEmpty ? '&nbsp;' : '';
     }
 
-    const raw = h.renderChildren(trimmed);
+    const raw = h.renderChildren(cleaned);
     return escapeParagraphLineStarts(unescapeBareUrlsInParagraph(raw));
   },
 });

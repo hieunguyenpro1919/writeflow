@@ -64,6 +64,14 @@ export function extractInventory(md: string): Inventory {
         inv.tables.push(`${header}---${rows}`);
       } else if (t.type === 'html') {
         inv.htmlBlocks.push(t.text.trim());
+        const hrefMatches = t.text.matchAll(/<a\s+[^>]*href=["']([^"']+)["']/gi);
+        for (const m of hrefMatches) {
+          inv.links.push(m[1]);
+        }
+        const srcMatches = t.text.matchAll(/<img\s+[^>]*src=["']([^"']+)["']/gi);
+        for (const m of srcMatches) {
+          inv.images.push(m[1]);
+        }
       } else if (t.type === 'link') {
         inv.links.push((t as Tokens.Link).href);
       } else if (t.type === 'image') {

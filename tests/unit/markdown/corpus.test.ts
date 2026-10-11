@@ -68,10 +68,8 @@ export const knownFailures: Record<string, KnownFailureInfo> = {
     hasCodeBlockMismatch: true,
   },
   'oss/lodash-readme.md': {
-    codes: ['B1b', 'B8', 'N1'],
-    reason:
-      'Trailing backslash doubles on round 2 (B1b), callout escaped (B8), bare & to &amp; (N1)',
-    isNonIdempotent: true,
+    codes: ['B8', 'N1'],
+    reason: 'Callout escaped (B8), bare & to &amp; (N1)',
   },
   'oss/markdown-it-readme.md': {
     codes: ['B8', 'N1'],
@@ -80,11 +78,6 @@ export const knownFailures: Record<string, KnownFailureInfo> = {
   'oss/marked-readme.md': {
     codes: ['N1'],
     reason: 'Bare & to &amp; (N1)',
-  },
-  'oss/mermaid-readme.md': {
-    codes: ['B1b'],
-    reason: 'Trailing backslash doubles on round 2 (B1b)',
-    isNonIdempotent: true,
   },
   'oss/awesome-readme.md': {
     codes: ['N1'],
@@ -122,12 +115,6 @@ export const knownFailures: Record<string, KnownFailureInfo> = {
   },
 
   // Synthetic documents
-  'synthetic/12-html-inline-tags.md': {
-    codes: ['B1b', 'TD-11'],
-    reason:
-      'Trailing backslash doubles on round 2 (B1b), inline HTML tags stripped without rawInline (TD-11)',
-    isNonIdempotent: true,
-  },
   'synthetic/13-html-link-img-extended.md': {
     codes: ['TD-12'],
     reason:
