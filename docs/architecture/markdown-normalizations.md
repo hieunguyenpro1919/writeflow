@@ -116,3 +116,12 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - Gỡ bỏ hoàn toàn mọi thao tác thay thế regex trên toàn chuỗi đầu ra (`serializer.ts`).
   - Việc khôi phục entity (`&copy;`, `&#35;`), tham chiếu footnote (`[^id]`), và chuẩn hóa đầu dòng reference definition (`\[ref]:`) được giới hạn phạm vi chặt chẽ trong các nút văn bản thường của `CustomParagraph` và `CustomHeading`.
   - Khối mã (`codeBlock`), code trong dòng (code span), khối HTML thô (`rawBlock`), và thẻ HTML (`rawHtmlTag`) được bảo toàn 100% nguyên văn, không bị biến dạng hay thay thế chuỗi.
+
+## 11. Escape Tối Thiểu và Cảnh Báo GitHub Alerts (Task 2.5e+g Phần 1 & 2)
+- **Escape tối thiểu cho văn bản thường (N1)**:
+  - `&`: Chỉ chuyển thành `&amp;` khi theo sau là mẫu entity (`&#?\w+;`); các trường hợp văn bản thông thường như `R&D`, `AT&T`, `C&A`, `1 < 2 && 3 > 2`, `supports & pick one` được giữ nguyên ký tự `&` thuần.
+  - `>`: Chỉ escape thành `&gt;` khi đứng ở đầu dòng (để tránh biến thành blockquote); giữa dòng (như `Node >= 20`, `a > b`) được giữ nguyên ký tự `>`.
+  - `<`: Chỉ escape khi tạo thành thẻ HTML, comment hoặc autolink (dạng `<tag>`, `<b>x</b>`, `<!-- c -->`, `<https://x>`); các biểu thức so sánh như `a < b`, `x<y`, `1 < 2` được giữ nguyên ký tự `<`.
+- **Cảnh báo GitHub Alerts (B8)**:
+  - Dòng đầu tiên của khối trích dẫn `blockquote` có dạng `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]` (không phân biệt hoa thường) được giữ nguyên byte-for-byte, không bị escape thành `> \[!NOTE\]`.
+  - Các cấu trúc danh sách hoặc khối mã đi kèm bên trong trích dẫn alert được giữ nguyên vẹn cấu trúc và độ thụt lề chuẩn.

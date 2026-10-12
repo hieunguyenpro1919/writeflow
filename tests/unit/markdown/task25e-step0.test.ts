@@ -26,8 +26,8 @@ describe('Task 2.5e+g Step 0: Scope entity, footnote, and reference escaping to 
     expect(serialize(parse(md).doc)).toBe(md);
   });
 
-  it('4. Plain text: preserves AT&amp;T &copy; &lt; and Footnote[^1] here.', () => {
-    const md1 = 'AT&amp;T &copy; &lt;\n';
+  it('4. Plain text: preserves AT&T &copy; < and Footnote[^1] here.', () => {
+    const md1 = 'AT&T &copy; <\n';
     expect(serialize(parse(md1).doc)).toBe(md1);
 
     const md2 = 'Footnote[^1] here.\n\n[^1]: The note.\n';

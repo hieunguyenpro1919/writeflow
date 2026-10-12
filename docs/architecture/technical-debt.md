@@ -28,9 +28,10 @@
 | **B2** | Link bọc ảnh huy hiệu CI badge `[![badge](img)](url)` và dạng tham chiếu (B2b, B2c) | Upstream OSS (Task 2.5b-fix2) | Nghiêm trọng (Mất URL) | Đã sửa (Task 2.5c, Task 2.5c-fix) | Đã sửa (Task 2.5c, Task 2.5c-fix) — `RawInlineNode` bảo toàn nguyên văn cả link inline, link tham chiếu và nhiều ảnh trong một link trên toàn bộ corpus |
 | **B6** | Thẻ HTML `<a href><img></a>` bị bóc tách thành ảnh trần | Upstream OSS (Task 2.5b-fix2) | Nghiêm trọng (Mất URL) | Đã sửa (Task 2.5c) | Đã sửa (Task 2.5c) — `RawInlineNode` bảo toàn nguyên văn `<a href><img></a>` trên cả đoạn văn và tiêu đề |
 | **B1b** | Ngắt dòng cuối đoạn văn hoặc `<br>` để lại ký tự `\` gấp đôi thành `\\` trên vòng serialize thứ 2 | Upstream OSS (Task 2.5b-fix2) | Trung bình (Group 3) | Đã sửa (Task 2.5d) | Đã sửa (Task 2.5d) — Loại bỏ newlines dẫn trước và khoảng trắng rác sau hardBreak, đạt idempotent tuyệt đối |
-| **B8** | GitHub callout alerts `> [!NOTE]` bị escape dấu ngoặc vuông thành `> \[!NOTE\]` | Upstream OSS (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên `oss/axios-readme.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md` |
-| **N1** | Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;` | Upstream OSS & Repo (Task 2.5b-fix2) | Thấp (Group 2) | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Tái hiện trên 14 file (`oss/awesome-readme.md`, `oss/express-history.md`, `oss/express-readme.md`, `oss/keep-a-changelog.md`, `oss/lodash-readme.md`, `oss/markdown-it-readme.md`, `oss/marked-readme.md`, `oss/redux-readme.md`, `real/repo-qa-manual.md`, `real/repo-readme.md`, `real/repo-tasks-phase-1.md`, `real/repo-tasks-phase-2.md`, `real/repo-versions.md`, `synthetic/27-edge-syntax-as-text.md`) |
+| **B8** | GitHub callout alerts `> [!NOTE]` bị escape dấu ngoặc vuông thành `> \[!NOTE\]` | Upstream OSS (Task 2.5b-fix2) | Thấp (Group 2) | Đã sửa (Task 2.5e+g) | Đã sửa (Task 2.5e+g) — Tự động bảo toàn cú pháp GitHub callouts / alerts `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]` |
+| **N1** | Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;` | Upstream OSS & Repo (Task 2.5b-fix2) | Thấp (Group 2) | Đã sửa (Task 2.5e+g) | Đã sửa (Task 2.5e+g) — Áp dụng cơ chế escape tối thiểu cho văn bản thuần: `&` chỉ thành `&amp;` khi sau nó là mẫu entity; `>` chỉ escape ở đầu dòng; `<` chỉ escape khi tạo thành thẻ HTML |
 | **TD-14** | Code span chứa nguyên văn `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` bị đổi | Task 2.5d Bước 0 | Thấp | Chấp nhận có điều kiện | Chấp nhận (hiếm khi xảy ra trong văn bản thực tế, chấp nhận để phục hồi comment trong code span) |
+| **TD-15** | Liên kết có thẻ bên trong bị tách thành hai link (ví dụ `[<sub>x</sub> y](url)`) | Task 2.5e+g | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) |
 
 ---
 
@@ -166,7 +167,7 @@
   - Chuỗi Markdown mẫu: `"> [!NOTE]\n> This is an alert."`
 - **Hành vi hiện tại:** Bộ escape đầu dòng hoặc paragraph escape nhận diện `[` trong trích dẫn và thêm dấu thoát `\\[`, biến alert chuẩn GitHub thành trích dẫn văn bản chứa dấu ngoặc vuông thoát.
 - **Hành vi mong muốn:** Bảo toàn cú pháp GitHub Callouts / Alerts `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`.
-- **Mức độ & Kế hoạch:** Thấp (Group 2). Cần xử lý qua Task Card riêng trước Gate A.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5e+g) — `CustomBlockquote` tự động bảo toàn nguyên vẹn cú pháp GitHub alerts trên dòng đầu của trích dẫn.
 
 ### N1: Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;`
 - **Chuỗi/JSON tái hiện:**
@@ -174,7 +175,7 @@
   - Chuỗi Markdown mẫu: `"Research & Development"`, `"arrayLimit & denial of service"`
 - **Hành vi hiện tại:** DOMParser chuyển ký tự `&` trong text thành `&amp;` hoặc serializer tự động sinh `&amp;` khi xuất ra Markdown.
 - **Hành vi mong muốn:** Ký tự `&` giữa dòng trong văn bản thuần Markdown không cần và không được mã hóa thành `&amp;` trừ khi là entity hợp lệ.
-- **Mức độ & Kế hoạch:** Thấp (Group 2). Cần xử lý qua Task Card riêng trước Gate A.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5e+g) — Áp dụng escape tối thiểu trong `restorePlainTextMarkdown`: `&` chỉ thành `&amp;` khi theo sau là mẫu entity; `>` chỉ escape ở đầu dòng; `<` chỉ escape khi tạo thành thẻ HTML.
 
 ### TD-14: Code span chứa nguyên văn `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` bị đổi
 - **Chuỗi/JSON tái hiện:**
@@ -182,3 +183,10 @@
 - **Hành vi hiện tại:** Để khôi phục comment inline trong code span (`<!-- x -->`), serializer thay thế chuỗi đại diện raw-inline thành comment thật trong node text mang mark `code`, dẫn tới việc nếu người dùng gõ nguyên văn thẻ span này trong code span thì nó sẽ bị đổi thành `<!-- x -->`.
 - **Hành vi mong muốn:** Nhận diện và phân biệt giữa span do engine sinh ra với chuỗi ký tự do người dùng nhập.
 - **Mức độ & Kế hoạch:** Thấp. Chấp nhận (trường hợp cực hiếm trong thực tế, chấp nhận có điều kiện).
+
+### TD-15: Liên kết có thẻ bên trong bị tách thành hai link (ví dụ `[<sub>x</sub> y](url)`)
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown mẫu: `[<sub>x</sub> y](https://example.com)`
+- **Hành vi hiện tại:** Khi bên trong liên kết Markdown có chứa thẻ HTML con (dưới dạng atomic inline node `rawHtmlTag`), ProseMirror có xu hướng tách khối liên kết thành hai liên kết riêng lẻ: một liên kết chứa thẻ con và một liên kết chứa văn bản còn lại.
+- **Hành vi mong muốn:** Giữ nguyên một liên kết thống nhất bao bọc toàn bộ thẻ HTML con và văn bản đi kèm.
+- **Mức độ & Kế hoạch:** Trung bình. Cần xử lý qua Task Card riêng trước Gate A.

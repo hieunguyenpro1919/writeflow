@@ -56,62 +56,12 @@ export interface KnownFailureInfo {
  */
 export const knownFailures: Record<string, KnownFailureInfo> = {
   // Upstream OSS defects
-  'oss/axios-readme.md': {
-    codes: ['B8'],
-    reason: 'Alert callout is escaped (B8)',
-  },
   'oss/express-history.md': {
-    codes: ['TD-10', 'N1'],
+    codes: ['TD-10'],
     reason:
-      'Indented list code block causes non-idempotent re-serialization and code blocks mismatch (TD-10), bare & to &amp; (N1)',
+      'Indented list code block causes non-idempotent re-serialization and code blocks mismatch (TD-10)',
     isNonIdempotent: true,
     hasCodeBlockMismatch: true,
-  },
-  'oss/lodash-readme.md': {
-    codes: ['B8', 'N1'],
-    reason: 'Callout escaped (B8), bare & to &amp; (N1)',
-  },
-  'oss/markdown-it-readme.md': {
-    codes: ['B8', 'N1'],
-    reason: 'Callout escaped (B8), bare & to &amp; (N1)',
-  },
-  'oss/marked-readme.md': {
-    codes: ['N1'],
-    reason: 'Bare & to &amp; (N1)',
-  },
-  'oss/awesome-readme.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'oss/express-readme.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'oss/keep-a-changelog.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-
-  // Internal repo documents
-  'real/repo-qa-manual.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'real/repo-readme.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'real/repo-tasks-phase-1.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'real/repo-tasks-phase-2.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
-  },
-  'real/repo-versions.md': {
-    codes: ['N1'],
-    reason: 'Bare & converted to &amp; (N1)',
   },
 
   // Synthetic documents

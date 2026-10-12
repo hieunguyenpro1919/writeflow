@@ -79,6 +79,20 @@ export function restorePlainTextMarkdown(content: string): string {
     .map((chunk, i) => {
       if (i % 2 === 1) return chunk;
       let text = chunk;
+      // N1: Minimal escaping for &, >, < while protecting tag-like constructs
+      const tagPattern =
+        /(&lt;(?:\/?[a-zA-Z][\w-]*(?:\s+[^&<>]*)?\/?|!--[\s\S]*?--|[!?][\s\S]*?|[a-zA-Z][a-zA-Z0-9+.-]*:[^\s&<>]+|[^\s&<>]+@[^\s&<>]+)&gt;)/g;
+      text = text
+        .split(tagPattern)
+        .map((sub, j) => {
+          if (j % 2 === 1) return sub;
+          let s = sub;
+          s = s.replace(/&amp;(?!(?:#[0-9]+|#[xX][0-9a-fA-F]+|[a-zA-Z0-9]+);)/g, '&');
+          s = s.replace(/((?:^|\n) {0,3}&gt;)|&gt;/g, (_m, lineStart) => lineStart ?? '>');
+          s = s.replace(/&lt;/g, '<');
+          return s;
+        })
+        .join('');
       text = text.replace(/&amp;(?!(?:amp|lt|gt|quot|apos);)([a-zA-Z0-9#]+;)/g, '&$1');
       text = text.replace(/\\\[\^([^\s\]]+)\\\]/g, '[^$1]');
       text = text.replace(/(^|\n)\\\[([^\]]+)\\\]:/g, '$1\\[$2]:');
@@ -184,7 +198,16 @@ export const CustomBlockquote = Blockquote.extend({
     if (!hasMeaningfulContent) {
       return '';
     }
-    return this.parent?.(node, h, ctx) ?? '';
+    const rendered = this.parent?.(node, h, ctx) ?? '';
+    let result = rendered.replace(
+      /^>\s*\\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\\]/im,
+      '> [!$1]',
+    );
+    result = result.replace(
+      /(^>\s*\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\])\n>\n(>\s*[-*+]|\d+\.|`{3})/im,
+      '$1\n$2',
+    );
+    return result;
   },
 });
 
