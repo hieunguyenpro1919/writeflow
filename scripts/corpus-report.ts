@@ -11,6 +11,7 @@ export interface FileReport {
   originalBytes: number;
   s1Bytes: number;
   s2Bytes: number;
+  s3Bytes: number;
   parseThrows: boolean;
   serializeThrows: boolean;
   error?: string;
@@ -202,6 +203,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
     let serializeThrows = false;
     let s1 = '';
     let s2 = '';
+    let s3 = '';
     let error: string | undefined;
 
     try {
@@ -209,13 +211,15 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
       s1 = serialize(parsed1.doc, parsed1.frontmatter, options);
       const parsed2 = parse(s1);
       s2 = serialize(parsed2.doc, parsed2.frontmatter, options);
+      const parsed3 = parse(s2);
+      s3 = serialize(parsed3.doc, parsed3.frontmatter, options);
     } catch (e: any) {
       parseThrows = true;
       serializeThrows = true;
       error = e.message || String(e);
     }
 
-    const isIdempotent = s1 === s2 && !parseThrows;
+    const isIdempotent = s1 === s2 && s2 === s3 && !parseThrows;
     const isByteExact = s1 === originalContent && !parseThrows;
 
     let invDiff = {
@@ -300,6 +304,7 @@ export function runCorpusEvaluation(corpusDir: string): FileReport[] {
       originalBytes: Buffer.byteLength(originalContent, 'utf8'),
       s1Bytes: Buffer.byteLength(s1, 'utf8'),
       s2Bytes: Buffer.byteLength(s2, 'utf8'),
+      s3Bytes: Buffer.byteLength(s3, 'utf8'),
       parseThrows,
       serializeThrows,
       error,

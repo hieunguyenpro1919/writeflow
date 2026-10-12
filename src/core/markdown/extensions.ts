@@ -11,6 +11,18 @@ import { Node, type AnyExtension } from '@tiptap/core';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Blockquote from '@tiptap/extension-blockquote';
 import Heading from '@tiptap/extension-heading';
+import { Lexer } from 'marked';
+
+// Prevent marked's anyPunctuation from destroying closing backticks in code spans containing backslashes (B5).
+const inlineRules = (
+  Lexer as unknown as { rules?: { inline?: Record<string, { anyPunctuation?: RegExp }> } }
+).rules?.inline;
+if (inlineRules) {
+  const safePunct = /(?<!(?<!\\)`)\\([\p{P}\p{S}])/gu;
+  ['gfm', 'breaks', 'normal', 'pedantic'].forEach((k) => {
+    if (inlineRules[k]) inlineRules[k].anyPunctuation = safePunct;
+  });
+}
 import {
   RawBlockExtension,
   RawTableExtension,
@@ -204,7 +216,7 @@ export const CustomBlockquote = Blockquote.extend({
       '> [!$1]',
     );
     result = result.replace(
-      /(^>\s*\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\])\n>\n(>\s*[-*+]|\d+\.|`{3})/im,
+      /(^>\s*\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\])\n>\n(>\s*(?:[-*+]|\d+\.|`{3}))/im,
       '$1\n$2',
     );
     return result;

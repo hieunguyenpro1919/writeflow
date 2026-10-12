@@ -124,4 +124,14 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - `<`: Chỉ escape khi tạo thành thẻ HTML, comment hoặc autolink (dạng `<tag>`, `<b>x</b>`, `<!-- c -->`, `<https://x>`); các biểu thức so sánh như `a < b`, `x<y`, `1 < 2` được giữ nguyên ký tự `<`.
 - **Cảnh báo GitHub Alerts (B8)**:
   - Dòng đầu tiên của khối trích dẫn `blockquote` có dạng `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]` (không phân biệt hoa thường) được giữ nguyên byte-for-byte, không bị escape thành `> \[!NOTE\]`.
-  - Các cấu trúc danh sách hoặc khối mã đi kèm bên trong trích dẫn alert được giữ nguyên vẹn cấu trúc và độ thụt lề chuẩn.
+  - Các cấu trúc danh sách hoặc khối mã đi kèm bên trong trích dẫn alert được giữ nguyên vẹn cấu trúc và độ thụt lề chuẩn, không bị chèn thêm dòng `>` trống giữa alert header và khối mã (Task 2.5f).
+
+## 12. Chuẩn hóa Thực thể và Thoát Đầu Dòng Văn Bản Thường (Task 2.5f)
+- **Chuẩn hóa thực thể HTML trong văn bản thường**:
+  - Khi phân tích vào AST rồi xuất ra, các thực thể HTML văn bản thường được giải mã/chuẩn hóa:
+    + `&amp;` -> `&`
+    + `&lt;` -> `<`
+    + `&#35;` -> `#`
+  - Các thực thể có ngữ nghĩa đặc biệt hoặc định dạng được giữ nguyên: `&copy;`, `&nbsp;`.
+- **Thoát ký tự trích dẫn đầu dòng `\>` thành `&gt;`**:
+  - Khi người dùng gõ `\>` ở đầu dòng văn bản thường trong editor hoặc tệp nguồn, serializer chuẩn hóa thành `&gt;` (thay vì để `\>` dễ bị hiểu nhầm hoặc biến đổi) để đảm bảo an toàn khối và tính idempotent tuyệt đối khi mở lại.

@@ -190,3 +190,10 @@
 - **Hành vi hiện tại:** Khi bên trong liên kết Markdown có chứa thẻ HTML con (dưới dạng atomic inline node `rawHtmlTag`), ProseMirror có xu hướng tách khối liên kết thành hai liên kết riêng lẻ: một liên kết chứa thẻ con và một liên kết chứa văn bản còn lại.
 - **Hành vi mong muốn:** Giữ nguyên một liên kết thống nhất bao bọc toàn bộ thẻ HTML con và văn bản đi kèm.
 - **Mức độ & Kế hoạch:** Trung bình. Cần xử lý qua Task Card riêng trước Gate A.
+
+### TD-16: `<?php` và `<foo@bar.com>` gõ tay trong editor không round-trip
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown / văn bản gõ tay: `"<?php ... ?>"` hoặc `"<foo@bar.com>"`
+- **Hành vi hiện tại:** Khi gõ tay trực tiếp trong editor dưới dạng văn bản thường, chuỗi bắt đầu bằng `<?php` bị parser xử lý thành processing instruction / raw HTML, hoặc email autolink `<foo@bar.com>` bị biến đổi thành link node mà không giữ nguyên văn bản thuần khi round-trip.
+- **Hành vi mong muốn:** Cơ chế phân biệt văn bản thường chứa ký tự giống tag với thẻ thực sự để round-trip tuyệt đối.
+- **Mức độ & Kế hoạch:** Thấp. Chấp nhận (trường hợp cực hiếm khi gõ tay ngoài code block, người dùng viết mã hoặc email thường dùng code span hoặc autolink chuẩn).

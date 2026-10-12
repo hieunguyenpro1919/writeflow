@@ -57,10 +57,9 @@ export interface KnownFailureInfo {
 export const knownFailures: Record<string, KnownFailureInfo> = {
   // Upstream OSS defects
   'oss/express-history.md': {
-    codes: ['TD-10'],
+    codes: [],
     reason:
-      'Indented list code block causes non-idempotent re-serialization and code blocks mismatch (TD-10)',
-    isNonIdempotent: true,
+      'Indented list paragraph treated as code block by marked lexer in original file (TD-10 resolved: fully idempotent)',
     hasCodeBlockMismatch: true,
   },
 
@@ -137,12 +136,15 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
           expect(s2).not.toBe(s1);
         });
       } else {
-        it('preserves idempotency (s2 === s1)', () => {
+        it('preserves idempotency across 3 serializations (s1 === s2 && s2 === s3)', () => {
           const p1 = parse(original);
           const s1 = serialize(p1.doc, p1.frontmatter, options);
           const p2 = parse(s1);
           const s2 = serialize(p2.doc, p2.frontmatter, options);
+          const p3 = parse(s2);
+          const s3 = serialize(p3.doc, p3.frontmatter, options);
           expect(s2).toBe(s1);
+          expect(s3).toBe(s2);
         });
       }
 
@@ -165,7 +167,7 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
         });
       }
 
-      if (!failureInfo) {
+      if (!failureInfo || failureInfo.codes.length === 0) {
         it('preserves resolved link and image URLs 100% (multiset check)', () => {
           const p1 = parse(original);
           const s1 = serialize(p1.doc, p1.frontmatter, options);
@@ -176,7 +178,7 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
         });
       }
 
-      if (failureInfo) {
+      if (failureInfo && failureInfo.codes.length > 0) {
         it(`actively asserts known defect reproduction (${failureInfo.codes.join(', ')})`, () => {
           const p1 = parse(original);
           const s1 = serialize(p1.doc, p1.frontmatter, options);

@@ -38,7 +38,17 @@ function sanitizeDocForSerialization(node: JSONContent, ph: string): JSONContent
     return { ...node, attrs: { ...node.attrs, content } };
   }
   if (Array.isArray(node.content)) {
-    return { ...node, content: node.content.map((c) => sanitizeDocForSerialization(c, ph)) };
+    const children = node.content.map((c) => sanitizeDocForSerialization(c, ph));
+    const merged: JSONContent[] = [];
+    for (const c of children) {
+      const prev = merged[merged.length - 1];
+      if (prev?.type === 'bulletList' && c?.type === 'bulletList') {
+        prev.content = [...(prev.content || []), ...(c.content || [])];
+      } else {
+        merged.push(c);
+      }
+    }
+    return { ...node, content: merged };
   }
   return node;
 }
