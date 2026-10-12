@@ -193,35 +193,113 @@ export const RawMathExtension = Extension.create({
 });
 
 /**
- * RawInlineExtension (Task 2.4 - Item 2)
- * Marks inline HTML tags (like <kbd>, <b>, <span>, <code>) so that they are treated
- * as verbatim raw inline elements, preventing Tiptap from stripping them or converting <b> to **.
+ * RawHtmlTag (Task 2.5d-fix)
+ * Represents individual inline HTML tags (opening, closing, self-closing, void) as atomic inline nodes.
+ * Preserves tags byte-for-byte without creating real or dangerous DOM elements.
  */
-export const RawInlineExtension = Mark.create({
-  name: 'rawInline',
-
-  priority: 1000,
-
-  excludes: '',
-
-  code: true, // Crucial: sets codeTypes in MarkdownManager to disable entity escaping
+export const RawHtmlTag = Node.create({
+  name: 'rawHtmlTag',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  selectable: false,
 
   addAttributes() {
     return {
-      tag: {
-        default: 'span',
-        parseHTML: (element) => element.tagName.toLowerCase(),
-      },
-      attrs: {
+      source: {
         default: '',
-        parseHTML: (element) => {
-          const rawAttrs = Array.from(element.attributes)
-            .filter((attr) => attr.name !== 'data-raw-inline')
-            .map((attr) => `${attr.name}="${attr.value}"`)
-            .join(' ');
-          return rawAttrs ? ` ${rawAttrs}` : '';
-        },
+        parseHTML: (el) => el.getAttribute('data-raw-source') || el.textContent || '',
       },
+    };
+  },
+
+  parseHTML() {
+    return [{ tag: 'span[data-raw-html-tag]' }];
+  },
+
+  renderHTML({ node }) {
+    return [
+      'span',
+      { 'data-raw-html-tag': '', 'data-raw-source': node.attrs.source },
+      node.attrs.source,
+    ];
+  },
+
+  markdownTokenName: 'rawHtmlTag',
+
+  markdownTokenizer: {
+    name: 'rawHtmlTag',
+    level: 'inline',
+    start(src: string): number {
+      return src.indexOf('<');
+    },
+    tokenize(src: string, tokens: unknown) {
+      if (src.startsWith('<!--')) return undefined;
+      const match = /^<(\/?)([a-zA-Z][\w:-]*)(?:\s+(?:[^"'<>/]+|"[^"]*"|'[^']*')*)*\s*(\/?)>/.exec(
+        src,
+      );
+      if (!match) return undefined;
+      if (match[0].includes('data-raw-comment')) return undefined;
+      const isClosing = match[1] === '/';
+      const tagName = match[2].toLowerCase();
+      if (tagName === 'span' && isClosing) {
+        const hasCommentSpan =
+          Array.isArray(tokens) &&
+          tokens.some(
+            (t: { type?: string; raw?: string }) =>
+              t.type === 'html' && t.raw?.includes('data-raw-comment'),
+          );
+        if (hasCommentSpan) return undefined;
+      }
+      if (tagName === 'br' || tagName === 'a' || tagName === 'img') return undefined;
+      if (/^(i|em|strong|del|s|strike)$/.test(tagName)) {
+        if (isClosing) {
+          const hasOpen =
+            Array.isArray(tokens) &&
+            tokens.some(
+              (t: { type?: string; raw?: string }) =>
+                t.type === 'html' && new RegExp(`^<${tagName}(\\s|>|$)`, 'i').test(t.raw || ''),
+            );
+          if (!hasOpen) return { type: 'rawHtmlTag', raw: match[0], text: match[0] };
+        } else {
+          const hasClose = new RegExp(`</${tagName}(\\s|>|$)`, 'i').test(src);
+          if (!hasClose) return { type: 'rawHtmlTag', raw: match[0], text: match[0] };
+        }
+        return undefined;
+      }
+      return { type: 'rawHtmlTag', raw: match[0], text: match[0] };
+    },
+  },
+
+  parseMarkdown(token) {
+    return {
+      type: this.name,
+      attrs: { source: (token.raw ?? token.text ?? '').toString() },
+    };
+  },
+
+  renderMarkdown(node) {
+    return node.attrs?.source ?? '';
+  },
+});
+
+/**
+ * RawInlineExtension (Task 2.4 - Item 2)
+ * Marks inline HTML comments so that they are treated as verbatim comments.
+ * Also registers RawHtmlTag extension for full schema synchronization.
+ */
+export const RawInlineExtension = Mark.create({
+  name: 'rawInline',
+  priority: 1000,
+  excludes: '',
+  code: true,
+
+  addExtensions() {
+    return [RawHtmlTag];
+  },
+
+  addAttributes() {
+    return {
       isComment: {
         default: false,
         parseHTML: (element) => element.getAttribute('data-raw-comment') === 'true',
@@ -230,36 +308,14 @@ export const RawInlineExtension = Mark.create({
   },
 
   parseHTML() {
-    return [
-      { tag: 'span[data-raw-comment]' },
-      {
-        tag: '*',
-        getAttrs: (element) => {
-          if (typeof element === 'string') return false;
-          const tag = (element as HTMLElement).tagName.toLowerCase();
-          const excluded =
-            /^(i|em|strong|del|s|strike|a|img|br|div|p|h[1-6]|ul|ol|li|blockquote|pre|hr|table|t[rhd]|tbody|thead|tfoot|colgroup|col|caption|section|article|aside|nav|header|footer|main|figure|figcaption|details|summary|dialog|html|head|body|script|style|meta|link|title)$/;
-          return excluded.test(tag) ? false : null;
-        },
-      },
-    ];
+    return [{ tag: 'span[data-raw-comment]' }];
   },
 
   renderHTML({ HTMLAttributes }) {
-    if (HTMLAttributes['data-raw-comment'] === 'true' || HTMLAttributes.isComment) {
-      return ['span', { 'data-raw-inline': '', 'data-raw-comment': 'true', ...HTMLAttributes }, 0];
-    }
-    const tag = (HTMLAttributes.tag as string) || 'span';
-    return [tag, { 'data-raw-inline': '', ...HTMLAttributes }, 0];
+    return ['span', { 'data-raw-inline': '', 'data-raw-comment': 'true', ...HTMLAttributes }, 0];
   },
 
   renderMarkdown(node, h) {
-    if (node.attrs?.isComment) {
-      return h.renderChildren(node);
-    }
-    const tag = node.attrs?.tag || 'span';
-    const attrs = node.attrs?.attrs || '';
-    const content = h.renderChildren(node);
-    return `<${tag}${attrs}>${content}</${tag}>`;
+    return h.renderChildren(node);
   },
 });

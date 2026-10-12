@@ -118,7 +118,7 @@
   - Chuỗi Markdown mẫu: `"Nhấn <kbd>Ctrl</kbd> + <kbd>B</kbd> để bật <b>Bold</b>"`, `"<mark>Text</mark>"`, `"H<sub>2</sub>O"`.
 - **Hành vi hiện tại:** Do ProseMirror/Tiptap chưa có extension `rawInline` (hiện tại mới có `rawBlock`), các thẻ inline HTML không thuộc schema mặc định bị bóc tách mất thẻ (ví dụ `<mark>Text</mark>` thành `Text`, `H<sub>2</sub>O` thành `H2O`) hoặc bị serializer escape dấu `<`, `>`.
 - **Hành vi mong muốn:** Cung cấp `rawInline` mark/node hoặc custom inline HTML preservation để giữ nguyên vẹn 100% cú pháp inline HTML mà không bị bóc tách hay escape.
-- **Mức độ & Kế hoạch:** Nghiêm trọng (Group 1 - Chặn Gate A). Cần sửa qua Task Card riêng trước khi đóng Phase 2.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5d-fix) — Chuyển đổi mọi thẻ HTML nội dòng sang nút nguyên tử `rawHtmlTag`, bảo toàn 100% nguyên văn byte-for-byte, thẻ lồng nhau, thẻ chưa đóng/đóng sai, và đảm bảo an toàn DOM Editor.
 
 ### TD-12: Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link
 - **Chuỗi/JSON tái hiện:**

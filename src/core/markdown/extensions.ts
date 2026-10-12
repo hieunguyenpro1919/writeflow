@@ -116,8 +116,8 @@ export const CustomParagraph = Paragraph.extend({
  * Custom HardBreak extension that outputs hard breaks with trailing backslash (Plan 9.3).
  */
 export const CustomHardBreak = HardBreak.extend({
-  renderMarkdown() {
-    return '\\\n';
+  renderMarkdown(_node, _h, ctx) {
+    return ctx?.parentType === 'heading' ? '<br>' : '\\\n';
   },
 });
 

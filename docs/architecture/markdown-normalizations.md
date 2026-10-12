@@ -102,3 +102,11 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 - Từ đoạn trống thứ hai trở đi (liên tiếp) được ghi thành `&nbsp;` trên dòng riêng và mở lại thành đoạn trống.
 - Đoạn trống ở **đầu file** ra dòng trống đầu file.
 - Đoạn trống ở **cuối file** (một đoạn) bị bỏ. Từ hai đoạn trở lên thì đoạn cuối còn lại dạng `&nbsp;`.
+
+## 9. Thẻ HTML nội dòng & Ngắt dòng Tiêu đề (Task 2.5d-fix)
+- **Thẻ HTML nội dòng dưới dạng nút nguyên tử (`rawHtmlTag`)**:
+  - Mọi thẻ HTML nội dòng (mở, đóng, tự đóng, void như `<wbr>`, `<hr>`) không thuộc nhóm định dạng canonical (`i`, `em`, `strong`, `del`, `s`, `strike`, `a`, `img`, `br`) được bảo toàn byte-for-byte dưới dạng nút nguyên tử `rawHtmlTag`.
+  - Các thẻ lồng nhau, thẻ chưa đóng (`<b>chưa đóng`), thẻ đóng cọc cạch (`<b>x</i>`), và các thuộc tính (`data-x='1'`, `title="a &amp; b"`) được giữ nguyên 100%.
+  - Thẻ nguy hiểm (`<script>`, `<iframe>`, `<style>`, `<form>`, `<input>`, ...) được bảo vệ thành node trơ `<span data-raw-html-tag>`, tuyệt đối không sinh ra thẻ thực thi trong DOM editor.
+- **Ngắt dòng cứng trong Tiêu đề Heading**:
+  - Ngắt dòng cứng bên trong tiêu đề (ví dụ `# a<br>b`) được xuất ra dưới dạng `<br>` nguyên văn (thay vì dấu gạch chéo ngược `\`), đảm bảo cú pháp heading hợp lệ và idempotent tuyệt đối qua nhiều lần lưu.
