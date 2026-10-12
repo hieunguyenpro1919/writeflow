@@ -110,3 +110,9 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - Thẻ nguy hiểm (`<script>`, `<iframe>`, `<style>`, `<form>`, `<input>`, ...) được bảo vệ thành node trơ `<span data-raw-html-tag>`, tuyệt đối không sinh ra thẻ thực thi trong DOM editor.
 - **Ngắt dòng cứng trong Tiêu đề Heading**:
   - Ngắt dòng cứng bên trong tiêu đề (ví dụ `# a<br>b`) được xuất ra dưới dạng `<br>` nguyên văn (thay vì dấu gạch chéo ngược `\`), đảm bảo cú pháp heading hợp lệ và idempotent tuyệt đối qua nhiều lần lưu.
+
+## 10. Phạm vi hóa Khôi phục Entity, Footnote & Reference (Task 2.5e+g Bước 0)
+- **Giới hạn phạm vi ở nút văn bản thường**:
+  - Gỡ bỏ hoàn toàn mọi thao tác thay thế regex trên toàn chuỗi đầu ra (`serializer.ts`).
+  - Việc khôi phục entity (`&copy;`, `&#35;`), tham chiếu footnote (`[^id]`), và chuẩn hóa đầu dòng reference definition (`\[ref]:`) được giới hạn phạm vi chặt chẽ trong các nút văn bản thường của `CustomParagraph` và `CustomHeading`.
+  - Khối mã (`codeBlock`), code trong dòng (code span), khối HTML thô (`rawBlock`), và thẻ HTML (`rawHtmlTag`) được bảo toàn 100% nguyên văn, không bị biến dạng hay thay thế chuỗi.

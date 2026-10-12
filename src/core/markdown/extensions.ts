@@ -10,6 +10,7 @@ import { TaskItem } from '@tiptap/extension-task-item';
 import { Node, type AnyExtension } from '@tiptap/core';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Blockquote from '@tiptap/extension-blockquote';
+import Heading from '@tiptap/extension-heading';
 import {
   RawBlockExtension,
   RawTableExtension,
@@ -69,6 +70,24 @@ export function unescapeBareUrlsInParagraph(content: string): string {
 }
 
 /**
+ * Restores named/numeric entities, footnote references, and reference definitions
+ * strictly within plain text nodes, leaving code spans, comments, tags, and links untouched.
+ */
+export function restorePlainTextMarkdown(content: string): string {
+  return content
+    .split(/(`+[\s\S]*?`+|<!--[\s\S]*?-->|<[^>]+>|\[[^\]]*\]\([^)]*\))/g)
+    .map((chunk, i) => {
+      if (i % 2 === 1) return chunk;
+      let text = chunk;
+      text = text.replace(/&amp;(?!(?:amp|lt|gt|quot|apos);)([a-zA-Z0-9#]+;)/g, '&$1');
+      text = text.replace(/\\\[\^([^\s\]]+)\\\]/g, '[^$1]');
+      text = text.replace(/(^|\n)\\\[([^\]]+)\\\]:/g, '$1\\[$2]:');
+      return text;
+    })
+    .join('');
+}
+
+/**
  * Custom Paragraph extension that avoids infinite recursion on empty content (Task 2.4c Group A),
  * trims trailing hardBreaks at block boundaries (Task 2.4c Group B),
  * restores unescaped characters in bare URLs (Task 2.5a TD-05),
@@ -108,7 +127,20 @@ export const CustomParagraph = Paragraph.extend({
     }
 
     const raw = h.renderChildren(cleaned);
-    return escapeParagraphLineStarts(unescapeBareUrlsInParagraph(raw));
+    return escapeParagraphLineStarts(unescapeBareUrlsInParagraph(restorePlainTextMarkdown(raw)));
+  },
+});
+
+/**
+ * Custom Heading extension that normalizes entities and footnote references in heading text.
+ */
+export const CustomHeading = Heading.extend({
+  renderMarkdown(node, h) {
+    const level = node.attrs?.level ? parseInt(node.attrs.level as string, 10) : 1;
+    const prefix = '#'.repeat(level);
+    if (!node.content) return '';
+    const raw = h.renderChildren(node.content);
+    return `${prefix} ${restorePlainTextMarkdown(raw)}`;
   },
 });
 
@@ -417,9 +449,7 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
       underline: false,
       horizontalRule: false,
       strike: {},
-      heading: {
-        levels: [1, 2, 3, 4, 5, 6],
-      },
+      heading: false,
       trailingNode: false,
       hardBreak: false,
       paragraph: false,
@@ -428,6 +458,7 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     }),
     CustomDocument,
     CustomParagraph,
+    CustomHeading,
     CustomHardBreak,
     CustomHorizontalRule,
     CustomBlockquote,
