@@ -35,6 +35,7 @@
 | **N1** | Ký tự `&` giữa dòng trong văn bản thuần bị tự động chuyển thành HTML entity `&amp;` | Upstream OSS & Repo (Task 2.5b-fix2) | Thấp (Group 2) | Đã sửa (Task 2.5e+g) | Đã sửa (Task 2.5e+g) — Áp dụng cơ chế escape tối thiểu cho văn bản thuần: `&` chỉ thành `&amp;` khi sau nó là mẫu entity; `>` chỉ escape ở đầu dòng; `<` chỉ escape khi tạo thành thẻ HTML |
 | **TD-14** | Code span chứa nguyên văn `<span data-raw-inline="" data-raw-comment="true">&lt;!-- x --&gt;</span>` bị đổi | Task 2.5d Bước 0 | Thấp | Chấp nhận có điều kiện | Chấp nhận (hiếm khi xảy ra trong văn bản thực tế, chấp nhận để phục hồi comment trong code span) |
 | **TD-15** | Liên kết có thẻ bên trong bị tách thành hai link (ví dụ `[<sub>x</sub> y](url)`) | Task 2.5e+g | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) |
+| **TD-17** | Code span nhiều dòng kết thúc bằng `\` chưa được kiểm tra | Task 2.5f-fix / Task 2.6a | Thấp | Phase 2 (trước Gate A) | Mở (Open) |
 
 ---
 
@@ -200,6 +201,13 @@
 - **Hành vi hiện tại:** Khi gõ tay trực tiếp trong editor dưới dạng văn bản thường, chuỗi bắt đầu bằng `<?php` bị parser xử lý thành processing instruction / raw HTML, hoặc email autolink `<foo@bar.com>` bị biến đổi thành link node mà không giữ nguyên văn bản thuần khi round-trip.
 - **Hành vi mong muốn:** Cơ chế phân biệt văn bản thường chứa ký tự giống tag với thẻ thực sự để round-trip tuyệt đối.
 - **Mức độ & Kế hoạch:** Thấp. Chấp nhận (trường hợp cực hiếm khi gõ tay ngoài code block, người dùng viết mã hoặc email thường dùng code span hoặc autolink chuẩn).
+
+### TD-17: Code span nhiều dòng kết thúc bằng `\` chưa được kiểm tra
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown mẫu: `` `multi\nline\` and **bold** ``
+- **Hành vi hiện tại:** Cơ chế `safePunctuation` (Task 2.5f-fix) quét dấu backtick mở trên cùng một dòng (`str.lastIndexOf('\n', match.index) + 1`). Nếu code span trải dài qua nhiều dòng và kết thúc bằng `\`` ở dòng kế tiếp, hành vi phân giải rào đóng có thể chưa được bao quát triệt để.
+- **Hành vi mong muốn:** Bảo toàn đồng nhất hành vi lexing code span kể cả khi vắt dòng (multi-line) và kết thúc bằng ký tự gạch chéo ngược `\`.
+- **Mức độ & Kế hoạch:** Thấp. Trường hợp code span vắt dòng kết thúc bằng `\` rất hiếm gặp trong thực tế. Đã ghi nhận để bổ sung bộ kiểm thử và hoàn thiện trước Gate A.
 
 ### B9: Mất khối mã lồng trong danh sách ở `express-history.md`
 - **Chuỗi/JSON tái hiện:**

@@ -13,6 +13,24 @@ import Blockquote from '@tiptap/extension-blockquote';
 import OrderedList from '@tiptap/extension-ordered-list';
 import Heading from '@tiptap/extension-heading';
 import { Lexer } from 'marked';
+import { TIPTAP_BLOCKQUOTE_DEFAULT_KEY, TIPTAP_HARDBREAK_DEFAULT_KEY } from '../keymap/shortcuts';
+
+/**
+ * Link URL validation adhering to CommonMark/Phase 1 rules:
+ * accepts only http, https, mailto, and relative paths (e.g. /, ./, ../, #, ?).
+ */
+export function isValidLinkHref(url: string): boolean {
+  if (!url) return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (/^(\/|\.\.?\/|#|\?)/.test(trimmed)) return true;
+  const schemeMatch = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(trimmed);
+  if (schemeMatch) {
+    const proto = schemeMatch[1].toLowerCase();
+    return proto === 'http' || proto === 'https' || proto === 'mailto';
+  }
+  return true;
+}
 
 // Prevent marked's anyPunctuation from destroying closing backticks in code spans containing backslashes (B5, B5b).
 const basePunct = /\\([\p{P}\p{S}])/gu;
@@ -226,6 +244,10 @@ export const CustomParagraph = Paragraph.extend({
  * Custom Heading extension that normalizes entities and footnote references in heading text.
  */
 export const CustomHeading = Heading.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+
   renderMarkdown(node, h) {
     const level = node.attrs?.level ? parseInt(node.attrs.level as string, 10) : 1;
     const prefix = '#'.repeat(level);
@@ -239,6 +261,13 @@ export const CustomHeading = Heading.extend({
  * Custom HardBreak extension that outputs hard breaks with trailing backslash (Plan 9.3).
  */
 export const CustomHardBreak = HardBreak.extend({
+  addKeyboardShortcuts() {
+    const parent = this.parent ? this.parent() : {};
+    const kept = { ...parent };
+    delete kept[TIPTAP_HARDBREAK_DEFAULT_KEY];
+    return kept;
+  },
+
   renderMarkdown(_node, _h, ctx) {
     return ctx?.parentType === 'heading' ? '<br>' : '\\\n';
   },
@@ -249,6 +278,10 @@ export const CustomHardBreak = HardBreak.extend({
  * in list containers to prevent CommonMark Setext heading collision (Task 2.4c Group C).
  */
 export const CustomHorizontalRule = HorizontalRule.extend({
+  addInputRules() {
+    return [];
+  },
+
   renderMarkdown(_node, _h, ctx) {
     if (ctx?.previousNode?.type === 'paragraph' && ctx?.parentType === 'listItem') {
       return '\n---';
@@ -261,6 +294,13 @@ export const CustomHorizontalRule = HorizontalRule.extend({
  * Custom Blockquote that serializes blockquotes with only empty paragraphs to empty string (TD-07).
  */
 export const CustomBlockquote = Blockquote.extend({
+  addKeyboardShortcuts() {
+    const parent = this.parent ? this.parent() : {};
+    const kept = { ...parent };
+    delete kept[TIPTAP_BLOCKQUOTE_DEFAULT_KEY];
+    return kept;
+  },
+
   renderMarkdown(node, h, ctx) {
     if (!node.content || !Array.isArray(node.content) || node.content.length === 0) {
       return '';
@@ -563,9 +603,33 @@ export const CustomDocument = Document.extend({
   },
 });
 
-export function createMarkdownEngineExtensions(): AnyExtension[] {
+export const CustomTaskList = TaskList.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+});
+
+export const CustomStarterKit = StarterKit.extend({
+  addExtensions() {
+    const parentExtensions: AnyExtension[] = this.parent ? this.parent() : [];
+
+    return parentExtensions.map((ext) => {
+      // Gỡ phím tắt định dạng mặc định (Task 1.3 / Phụ lục A)
+      if (['bold', 'italic', 'strike', 'code', 'bulletList', 'orderedList'].includes(ext.name)) {
+        return ext.extend({
+          addKeyboardShortcuts() {
+            return {};
+          },
+        });
+      }
+      return ext;
+    });
+  },
+});
+
+export function createCoreSchemaExtensions(): AnyExtension[] {
   return [
-    StarterKit.configure({
+    CustomStarterKit.configure({
       link: false,
       codeBlock: false,
       underline: false,
@@ -580,19 +644,23 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     }),
     CustomDocument,
     CustomParagraph,
-    CustomHeading,
+    CustomHeading.configure({
+      levels: [1, 2, 3, 4, 5, 6],
+    }),
     CustomHardBreak,
     CustomHorizontalRule,
     CustomBlockquote,
     CustomLink.configure({
       openOnClick: false,
+      validate: isValidLinkHref,
+      isAllowedUri: isValidLinkHref,
     }),
     CustomCodeBlock,
     CustomImage.configure({
       inline: true,
       allowBase64: true,
     }),
-    TaskList,
+    CustomTaskList,
     TaskItem.configure({
       nested: true,
     }),
@@ -604,3 +672,5 @@ export function createMarkdownEngineExtensions(): AnyExtension[] {
     RawInlineNode,
   ];
 }
+
+export const createMarkdownEngineExtensions = createCoreSchemaExtensions;

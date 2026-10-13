@@ -23,6 +23,8 @@ export const RawBlockExtension = Node.create<RawBlockOptions>({
 
   atom: true,
 
+  selectable: true,
+
   isolating: true,
 
   defining: true,
@@ -202,7 +204,7 @@ export const RawHtmlTag = Node.create({
   group: 'inline',
   inline: true,
   atom: true,
-  selectable: false,
+  selectable: true,
 
   addAttributes() {
     return {
@@ -220,7 +222,15 @@ export const RawHtmlTag = Node.create({
   renderHTML({ node }) {
     return [
       'span',
-      { 'data-raw-html-tag': '', 'data-raw-source': node.attrs.source },
+      {
+        'data-raw-html-tag': '',
+        'data-raw-source': node.attrs.source,
+        class: 'raw-html-tag',
+        title: 'Nội dung chưa hỗ trợ chỉnh sửa trực quan',
+        style:
+          'font-family: var(--editor-font-mono, monospace); border: 1px solid var(--editor-border-color, #e2e8f0); border-radius: 3px; padding: 1px 4px; background: var(--editor-bg-code, #f8fafc); user-select: all;',
+        contenteditable: 'false',
+      },
       node.attrs.source,
     ];
   },
