@@ -32,6 +32,27 @@ export interface FileReport {
   defects: string[];
 }
 
+export interface AstTokenCounts {
+  strong: number;
+  em: number;
+  codespan: number;
+  link: number;
+  image: number;
+  table: number;
+  listItem: number;
+  code: number;
+}
+
+export const ACCEPTED_NORMALIZATIONS = [
+  'HTML anchor <a> normalized to markdown link [text](url)',
+  'HTML emphasis <i> / <em> normalized to markdown *emphasis*',
+  'HTML line break <br> normalized to trailing backslash \\',
+  'Reference link definition [text][ref] normalized to inline link [text](url)',
+  'Bare URL autolinked to [url](url)',
+  'Adjacent bullet lists merged into a single list block',
+  'Code block indentation in list items normalized to canonical markdown indent',
+];
+
 export interface Inventory {
   frontmatter: string;
   words: string[];
@@ -40,6 +61,7 @@ export interface Inventory {
   codeBlocks: string[];
   tables: string[];
   htmlBlocks: string[];
+  astTokens: AstTokenCounts;
 }
 
 export function extractInventory(md: string): Inventory {
@@ -53,16 +75,43 @@ export function extractInventory(md: string): Inventory {
     codeBlocks: [],
     tables: [],
     htmlBlocks: [],
+    astTokens: {
+      strong: 0,
+      em: 0,
+      codespan: 0,
+      link: 0,
+      image: 0,
+      table: 0,
+      listItem: 0,
+      code: 0,
+    },
   };
 
   function walk(tokenList: Tokens.Generic[] | Token[]) {
     for (const t of tokenList) {
-      if (t.type === 'code') {
-        inv.codeBlocks.push(`${t.lang || ''}:${t.text.trim()}`);
+      if (t.type === 'strong') {
+        inv.astTokens.strong++;
+      } else if (t.type === 'em') {
+        inv.astTokens.em++;
+      } else if (t.type === 'codespan') {
+        inv.astTokens.codespan++;
+      } else if (t.type === 'link') {
+        inv.astTokens.link++;
+        inv.links.push((t as Tokens.Link).href);
+      } else if (t.type === 'image') {
+        inv.astTokens.image++;
+        const img = t as Tokens.Image;
+        inv.images.push(`${img.href}|${img.text || ''}|${img.title || ''}`);
       } else if (t.type === 'table') {
+        inv.astTokens.table++;
         const header = (t as Tokens.Table).header.map((c) => c.text.trim()).join('|');
         const rows = (t as Tokens.Table).rows.map((r) => r.map((c) => c.text.trim()).join('|')).join(';');
         inv.tables.push(`${header}---${rows}`);
+      } else if (t.type === 'list_item') {
+        inv.astTokens.listItem++;
+      } else if (t.type === 'code') {
+        inv.astTokens.code++;
+        inv.codeBlocks.push(`${t.lang || ''}:${t.text.trim()}`);
       } else if (t.type === 'html') {
         inv.htmlBlocks.push(t.text.trim());
         const hrefMatches = t.text.matchAll(/<a\s+[^>]*href=["']([^"']+)["']/gi);
@@ -73,11 +122,6 @@ export function extractInventory(md: string): Inventory {
         for (const m of srcMatches) {
           inv.images.push(m[1]);
         }
-      } else if (t.type === 'link') {
-        inv.links.push((t as Tokens.Link).href);
-      } else if (t.type === 'image') {
-        const img = t as Tokens.Image;
-        inv.images.push(`${img.href}|${img.text || ''}|${img.title || ''}`);
       }
 
       if ('text' in t && typeof t.text === 'string' && t.type !== 'code' && t.type !== 'html') {
@@ -131,6 +175,26 @@ export function compareInventories(inv1: Inventory, inv2: Inventory) {
 
   const imagesMatch = JSON.stringify(inv1.images) === JSON.stringify(inv2.images);
   if (!imagesMatch) details.push(`Images mismatch (orig: ${inv1.images.length}, s1: ${inv2.images.length})`);
+
+  // AST tokens check
+  if (inv2.astTokens.code !== inv1.astTokens.code) {
+    details.push(`AST code count mismatch (orig: ${inv1.astTokens.code}, s1: ${inv2.astTokens.code})`);
+  }
+  if (inv2.astTokens.table !== inv1.astTokens.table) {
+    details.push(`AST table count mismatch (orig: ${inv1.astTokens.table}, s1: ${inv2.astTokens.table})`);
+  }
+  if (inv2.astTokens.listItem !== inv1.astTokens.listItem) {
+    details.push(`AST listItem count mismatch (orig: ${inv1.astTokens.listItem}, s1: ${inv2.astTokens.listItem})`);
+  }
+  if (inv2.astTokens.strong < inv1.astTokens.strong) {
+    details.push(`AST strong lost (orig: ${inv1.astTokens.strong}, s1: ${inv2.astTokens.strong})`);
+  }
+  if (inv2.astTokens.em < inv1.astTokens.em) {
+    details.push(`AST em lost (orig: ${inv1.astTokens.em}, s1: ${inv2.astTokens.em})`);
+  }
+  if (inv2.astTokens.codespan < inv1.astTokens.codespan) {
+    details.push(`AST codespan lost (orig: ${inv1.astTokens.codespan}, s1: ${inv2.astTokens.codespan})`);
+  }
 
   // Words multiset difference
   const words1 = [...inv1.words];

@@ -55,14 +55,6 @@ export interface KnownFailureInfo {
  * so that when the bug is fixed in future tasks, the test turns RED to force removal.
  */
 export const knownFailures: Record<string, KnownFailureInfo> = {
-  // Upstream OSS defects
-  'oss/express-history.md': {
-    codes: [],
-    reason:
-      'Indented list paragraph treated as code block by marked lexer in original file (TD-10 resolved: fully idempotent)',
-    hasCodeBlockMismatch: true,
-  },
-
   // Synthetic documents
   'synthetic/13-html-link-img-extended.md': {
     codes: ['TD-12'],
@@ -175,6 +167,20 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
           const invS1 = extractInventory(s1);
           expect(invS1.links).toEqual(invOrig.links);
           expect(invS1.images).toEqual(invOrig.images);
+        });
+
+        it('preserves AST inventory tokens (strong, em, codespan, listItem)', () => {
+          const p1 = parse(original);
+          const s1 = serialize(p1.doc, p1.frontmatter, options);
+          const invOrig = extractInventory(original);
+          const invS1 = extractInventory(s1);
+
+          expect(invS1.astTokens.code).toBe(invOrig.astTokens.code);
+          expect(invS1.astTokens.table).toBe(invOrig.astTokens.table);
+          expect(invS1.astTokens.listItem).toBe(invOrig.astTokens.listItem);
+          expect(invS1.astTokens.strong).toBeGreaterThanOrEqual(invOrig.astTokens.strong);
+          expect(invS1.astTokens.em).toBeGreaterThanOrEqual(invOrig.astTokens.em);
+          expect(invS1.astTokens.codespan).toBeGreaterThanOrEqual(invOrig.astTokens.codespan);
         });
       }
 

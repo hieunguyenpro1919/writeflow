@@ -21,7 +21,10 @@
 | **TD-07** | Blockquote chứa duy nhất đoạn trống (`>\n`) mất trên serialize lần 2 | Task 2.4c Ma trận 3b | Thấp | Đã sửa (Task 2.5a, 2.5a-fix) | Đã sửa (Task 2.5a, 2.5a-fix) |
 | **TD-08** | Task item chứa block non-text bị marked parse thành bullet text `[ ]` | Task 2.4c Ma trận 3b | Trung bình | Hoãn đến Phase 6 | Hoãn đến Phase 6. Điều kiện cứng: phải sửa xong trước khi bật nút Task list trong UI |
 | **TD-09** | HorizontalRule ở vị trí only/first trong list item không có đoạn văn neo | Task 2.4c Ma trận 3b | Trung bình | Chờ corpus | Chờ kết quả corpus (Task 2.5b) |
-| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix2 (`oss/express-history.md`, `oss/jest-readme.md`) |
+| **TD-10** | Khối phức tạp trong ordered/bullet list không idempotent do thụt lề 3-space của marked | Task 2.4c Ma trận 3b | Trung bình | Đã sửa (Task 2.5f-fix) | Đã sửa (Task 2.5f-fix) — Triệt tiêu lệch thụt lề và bảo toàn 100% khối mã trong danh sách (`oss/express-history.md`) |
+| **B9** | Mất khối mã lồng trong danh sách ở `express-history.md` (3 khối mã bị mất) | Upstream OSS (Task 2.5f-fix) | Nghiêm trọng (Mất code) | Đã sửa (Task 2.5f-fix) | Đã sửa (Task 2.5f-fix) — `CustomCodeBlock.parseMarkdown` hỗ trợ khối mã có thụt lề dẫn trước trong list item |
+| **B10** | Dư dấu cách trong khối mã thuộc danh sách số (`npm i` thành `    npm i`) | Upstream OSS (Task 2.5f-fix) | Trung bình (Lệch thụt lề) | Đã sửa (Task 2.5f-fix) | Đã sửa (Task 2.5f-fix) — `OrderedList` tokenizer chuẩn hóa thụt lề nội dung khối mã con |
+| **B5b** | Code span kết thúc bằng `\` (ví dụ `` `a\` ``) làm mất `**bold**` phía sau | Upstream OSS & Repo (Task 2.5f-fix) | Trung bình | Đã sửa (Task 2.5f-fix) | Đã sửa (Task 2.5f-fix) — `safePunctuation` nhận biết fence code span, ngăn mask làm hỏng closing backtick |
 | **TD-11** | Inline HTML tags (`<abbr>`, `<b>`, `<code>`, `<kbd>`, `<mark>`, `<sub>`, `<sup>`) bị mất hoặc thoát | Task 2.5b (Corpus) | Nghiêm trọng | Đã sửa (Task 2.5d) | Đã sửa (Task 2.5d) — `RawInlineExtension` bảo toàn 100% thẻ inline HTML trên toàn bộ corpus |
 | **TD-12** | Thẻ HTML link/image mở rộng có thuộc tính tùy biến bị mất thuộc tính khi chuyển thành markdown link | Task 2.5b (Corpus) | Trung bình | Phase 2 Task Card riêng (trước Gate A) | Mở (Open) — Xác nhận qua Corpus thật Task 2.5b-fix2 (`synthetic/13-html-link-img-extended.md`) |
 | **TD-13** | Code span chứa ký tự phân cách thoát (`\~~~`, `\``` `) bị bọc thêm backtick và escape trên serialize lần 2 | Task 2.5b-fix (Corpus) | Thấp | Đã sửa (Task 2.5c) | Đã sửa (Task 2.5c) — Xử lý cùng B3 (bảo toàn khoảng trắng code span) giúp `real/repo-markdown-normalizations.md` đạt idempotent tuyệt đối |
@@ -197,3 +200,26 @@
 - **Hành vi hiện tại:** Khi gõ tay trực tiếp trong editor dưới dạng văn bản thường, chuỗi bắt đầu bằng `<?php` bị parser xử lý thành processing instruction / raw HTML, hoặc email autolink `<foo@bar.com>` bị biến đổi thành link node mà không giữ nguyên văn bản thuần khi round-trip.
 - **Hành vi mong muốn:** Cơ chế phân biệt văn bản thường chứa ký tự giống tag với thẻ thực sự để round-trip tuyệt đối.
 - **Mức độ & Kế hoạch:** Thấp. Chấp nhận (trường hợp cực hiếm khi gõ tay ngoài code block, người dùng viết mã hoặc email thường dùng code span hoặc autolink chuẩn).
+
+### B9: Mất khối mã lồng trong danh sách ở `express-history.md`
+- **Chuỗi/JSON tái hiện:**
+  - File corpus bị ảnh hưởng: `oss/express-history.md`.
+  - Mẫu tối thiểu: `- item\n  \`\`\`js\n  QUERY /reports\n  \`\`\`\n`
+- **Hành vi ban đầu:** Khi một khối mã nằm lồng trong mục danh sách có thụt lề dẫn trước (ví dụ 2 dấu cách), Tiptap `@tiptap/extension-code-block` mặc định kiểm tra `token.raw?.startsWith('\`\`\`') === false`. Do `token.raw` bắt đầu bằng khoảng trắng thụt lề (`  \`\`\`js`), Tiptap trả về mảng rỗng `[]`, làm mất hoàn toàn 3 khối mã trong `express-history.md` (số token `code` của marked giảm từ 4 về 0).
+- **Hành vi mong muốn:** Bảo toàn 100% các khối mã lồng trong danh sách với số token và nội dung nguyên văn khớp hoàn toàn văn bản nguồn.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5f-fix) — `CustomCodeBlock.parseMarkdown` gọi `.trimStart()` trên `token.raw` trước khi kiểm tra rào cú pháp, phục hồi toàn vẹn cả 4 khối mã trong `express-history.md`.
+
+### B10: Dư dấu cách trong khối mã thuộc danh sách số
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown mẫu: `"1. step\n\n   \`\`\`bash\n   npm i\n   \`\`\`\n"`
+- **Hành vi ban đầu:** Khối mã xuất ra bị dư 1 khoảng trắng thành `"    npm i"`.
+- **Nguyên nhân gốc:** Tokenizer của `@tiptap/extension-ordered-list` tính toán thụt lề nội dung `contentIndent = indentLevel + marker.length + 1` làm phát sinh độ lệch 1 dấu cách trên các dòng nội dung của code block con.
+- **Hành vi mong muốn:** Bảo toàn đúng từng byte thụt lề của khối mã lồng trong danh sách số, danh sách bullet và lồng nhiều cấp.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5f-fix) — Bọc tokenizer của `OrderedList` để loại bỏ chính xác độ lệch khoảng trắng dư thừa tương ứng giữa rào mở và đóng của code block.
+
+### B5b: Code span kết thúc bằng dấu gạch chéo ngược làm mất `**bold**`
+- **Chuỗi/JSON tái hiện:**
+  - Chuỗi Markdown mẫu: `` `a\` and **bold** and `b` `` và `` `C:\dir\` and **x** ``
+- **Hành vi ban đầu:** Quy tắc `anyPunctuation` của `marked` chuyển dấu `\` và dấu backtick đóng thành `++` trong chuỗi mặt nạ lexing `n`, làm hỏng rào đóng của code span và khiến bộ parser nuốt chửng các token `**bold**` phía sau thành văn bản thuần rồi bị escape thành `\*\*bold\*\*`.
+- **Hành vi mong muốn:** Code span kết thúc bằng dấu gạch chéo ngược phải bảo toàn 100% token in đậm/nghiêng phía sau byte-for-byte.
+- **Mức độ & Kế hoạch:** Đã sửa (Task 2.5f-fix) — Áp dụng `safePunctuation` cho `marked.Lexer.rules.inline.*.anyPunctuation` theo dõi chính xác độ dài rào mở/đóng code span trên từng dòng để không mask nhầm ký tự `\` nằm ngay trước dấu backtick đóng. Có kèm assertion runtime khẳng định cấu trúc marked không bị phá vỡ.

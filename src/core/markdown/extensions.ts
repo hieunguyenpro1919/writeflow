@@ -10,18 +10,83 @@ import { TaskItem } from '@tiptap/extension-task-item';
 import { Node, type AnyExtension } from '@tiptap/core';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Blockquote from '@tiptap/extension-blockquote';
+import OrderedList from '@tiptap/extension-ordered-list';
 import Heading from '@tiptap/extension-heading';
 import { Lexer } from 'marked';
 
-// Prevent marked's anyPunctuation from destroying closing backticks in code spans containing backslashes (B5).
+// Prevent marked's anyPunctuation from destroying closing backticks in code spans containing backslashes (B5, B5b).
+const basePunct = /\\([\p{P}\p{S}])/gu;
+export const safePunctuation = Object.assign(new RegExp(basePunct.source, basePunct.flags), {
+  exec(this: RegExp, str: string) {
+    basePunct.lastIndex = this.lastIndex;
+    while (true) {
+      const match = basePunct.exec(str);
+      if (!match) {
+        this.lastIndex = basePunct.lastIndex;
+        return null;
+      }
+      if (match[1] === '`') {
+        const lineBefore = str.slice(str.lastIndexOf('\n', match.index) + 1, match.index);
+        let openLen = 0;
+        let i = 0;
+        while (i < lineBefore.length) {
+          if (lineBefore[i] === '`') {
+            let len = 0;
+            while (i < lineBefore.length && lineBefore[i] === '`') {
+              len++;
+              i++;
+            }
+            if (openLen === 0) openLen = len;
+            else if (openLen === len) openLen = 0;
+          } else {
+            i++;
+          }
+        }
+        if (openLen > 0) continue;
+      }
+      this.lastIndex = basePunct.lastIndex;
+      return match;
+    }
+  },
+});
+
 const inlineRules = (
   Lexer as unknown as { rules?: { inline?: Record<string, { anyPunctuation?: RegExp }> } }
 ).rules?.inline;
-if (inlineRules) {
-  const safePunct = /(?<!(?<!\\)`)\\([\p{P}\p{S}])/gu;
-  ['gfm', 'breaks', 'normal', 'pedantic'].forEach((k) => {
-    if (inlineRules[k]) inlineRules[k].anyPunctuation = safePunct;
-  });
+if (!inlineRules || !inlineRules.gfm) {
+  throw new Error('Marked internal structure changed: Lexer.rules.inline not found');
+}
+['gfm', 'breaks', 'normal', 'pedantic'].forEach((k) => {
+  if (inlineRules[k]) inlineRules[k].anyPunctuation = safePunctuation;
+});
+
+// Fix off-by-one indentation in OrderedList markdown tokenizer for nested code blocks (B10).
+const mdTokenizer = OrderedList.config.markdownTokenizer;
+const origOLTokenize = mdTokenizer?.tokenize;
+if (mdTokenizer && origOLTokenize) {
+  mdTokenizer.tokenize = function (...args: Parameters<typeof origOLTokenize>) {
+    const res = origOLTokenize.apply(this, args) as
+      { items?: { tokens?: { type: string; raw?: string; text?: string }[] }[] } | undefined;
+    if (res && Array.isArray(res.items)) {
+      for (const item of res.items) {
+        if (Array.isArray(item.tokens)) {
+          for (const tok of item.tokens) {
+            if (tok.type === 'code') {
+              const closeMatch = tok.raw?.match(/\n( +)(?:`{3,}|~{3,})\s*$/);
+              const openMatch = tok.raw?.match(/^( *)(?:`{3,}|~{3,})/);
+              const excess =
+                (closeMatch ? closeMatch[1].length : 0) - (openMatch ? openMatch[1].length : 0);
+              if (excess > 0 && tok.text) {
+                tok.text = tok.text.replace(new RegExp(`^ {1,${excess}}`, 'gm'), '');
+                tok.raw = tok.raw?.replace(new RegExp(`^ {1,${excess}}`, 'gm'), '');
+              }
+            }
+          }
+        }
+      }
+    }
+    return res as ReturnType<typeof origOLTokenize>;
+  };
 }
 import {
   RawBlockExtension,
@@ -234,6 +299,28 @@ export const CustomCodeBlock = CodeBlock.extend({
 
   addInputRules() {
     return [];
+  },
+
+  parseMarkdown(token, helpers) {
+    const raw = (token.raw ?? '').trimStart();
+    if (!raw.startsWith('```') && !raw.startsWith('~~~') && token.codeBlockStyle !== 'indented') {
+      return [];
+    }
+
+    let text = token.text || '';
+    const closeMatch = token.raw?.match(/\n( +)(?:`{3,}|~{3,})\s*$/);
+    const openMatch = token.raw?.match(/^( *)(?:`{3,}|~{3,})/);
+    const excessIndent =
+      (closeMatch ? closeMatch[1].length : 0) - (openMatch ? openMatch[1].length : 0);
+    if (excessIndent > 0 && text) {
+      text = text.replace(new RegExp(`^ {1,${excessIndent}}`, 'gm'), '');
+    }
+
+    return helpers.createNode(
+      'codeBlock',
+      { language: token.lang || null },
+      text ? [helpers.createTextNode(text)] : [],
+    );
   },
 
   renderMarkdown(node, h) {

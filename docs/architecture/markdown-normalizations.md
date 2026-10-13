@@ -25,6 +25,10 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
   - Ordered list (`1. `) thụt lề chuẩn 3 khoảng trắng tương ứng với độ rộng ký tự đánh số.
 - **Danh sách lỏng (Loose List) -> Danh sách chặt (Tight List)**:
   - Khi người dùng không có chủ đích phân đoạn văn trong từng mục danh sách, các khoảng trống thừa giữa các bullet item sẽ được gom gọn theo chuẩn canonical.
+- **Hợp nhất danh sách bullet liền kề (Task 2.5f)**:
+  - Khi các khối danh sách bullet liền kề nhau phân tách bởi dòng trống (thường gặp trong changelog hoặc lịch sử phát triển như `express-history.md`), parser hợp nhất chúng thành một khối danh sách duy nhất, bảo toàn nguyên vẹn 100% các mục con và cấu trúc lồng, đạt tính ổn định idempotent tuyệt đối ($s_1 \equiv s_2 \equiv s_3$).
+- **Bảo toàn khối mã lồng trong danh sách (Task 2.5f-fix, B9 & B10)**:
+  - Khối mã (`codeBlock`) lồng trong danh sách bullet và danh sách số (ordered list) được bảo toàn nguyên vẹn nội dung byte-for-byte. Thụt lề nội dung code block được căn chỉnh chuẩn xác theo rào cú pháp (`fence marker`), triệt tiêu độ lệch khoảng trắng (off-by-one indent).
 
 ## 3. Đường kẻ ngang (Thematic Breaks / Horizontal Rules)
 - **Chuẩn hóa ký tự**:
