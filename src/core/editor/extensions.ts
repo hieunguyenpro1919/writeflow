@@ -1,6 +1,7 @@
 import type { Extensions } from '@tiptap/core';
 import { KeymapExtension } from '../keymap/keymap-extension';
 import { SmartKeysExtension } from './smart-keys';
+import { PasteSanitizerExtension } from './paste-sanitizer';
 import type { CommandRegistry, Platform, UiBridge } from '../commands/types';
 import { defaultCommandRegistry } from '../commands/registry';
 import { detectPlatform } from '../keymap/platform';
@@ -41,6 +42,7 @@ export {
   RawMathExtension,
   RawInlineExtension,
   RawHtmlTag,
+  PasteSanitizerExtension,
 };
 
 /**
@@ -52,6 +54,7 @@ export function createExtensions(options?: CreateExtensionsOptions): Extensions 
   return [
     ...createCoreSchemaExtensions(),
     SmartKeysExtension,
+    PasteSanitizerExtension,
     KeymapExtension.configure({
       registry: options?.registry ?? defaultCommandRegistry,
       platform: options?.platform ?? detectPlatform(),

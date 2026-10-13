@@ -456,6 +456,13 @@ export const CustomImage = Image.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: (el) => {
+          const s = el.getAttribute('src');
+          return s && !/^(javascript|data|vbscript):/i.test(s.trim()) ? s : null;
+        },
+      },
       width: {
         default: null,
         parseHTML: (el) => el.getAttribute('width'),
@@ -477,6 +484,14 @@ export const CustomImage = Image.extend({
         parseHTML: (el) => el.getAttribute('id'),
       },
     };
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const s = String(HTMLAttributes.src || '').trim();
+    return [
+      'img',
+      /^(javascript|data|vbscript):/i.test(s) ? { ...HTMLAttributes, src: '' } : HTMLAttributes,
+    ];
   },
 
   parseMarkdown(token) {

@@ -12,7 +12,7 @@
 | Mã | Hạng mục | Nguồn gốc | Mức độ | Phase xử lý | Trạng thái |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **TD-01** | Cảnh báo kích thước gói bundle vượt 500 kB (~678 kB JS) | Phase 1 (Core Editor) | Trung bình | Phase 3 | Mở (Open) |
-| **TD-02** | Bắt sự kiện IME qua tham chiếu toàn cục `window.event` trong `SmartKeysExtension` | Phase 1 (Task 1.9) | Trung bình | Phase 3 | Mở (Open) |
+| **TD-02** | Bắt sự kiện IME qua tham chiếu toàn cục `window.event` trong `SmartKeysExtension` | Phase 1 (Task 1.9) | Trung bình | Phase 2 (Task 2.6c) | Đã giải quyết (Task 2.6c: bảo vệ IME composition toàn diện qua PasteSanitizerExtension) |
 | **TD-03** | Khoảng trắng 1–3 hoặc tab đầu dòng trước ký hiệu mở lại thành block | Task 2.4c Mục 4 | Thấp | Chấp nhận có điều kiện | Chấp nhận có điều kiện, ủy quyền ngày 07/10/2026. (Hết hiệu lực nếu corpus Task 2.5b báo lỗi mất dữ liệu trên file thật) |
 | **TD-04** | Văn bản gõ entity số `&#35;`, `&#..;` mở lại bị giải mã | Task 2.4c Mục 4 | Thấp | Chấp nhận có điều kiện | Chấp nhận có điều kiện, ủy quyền ngày 07/10/2026. (Hết hiệu lực nếu corpus Task 2.5b báo lỗi) |
 | **TD-05** | URL trần có `_` bị escape thành `\_` hiển thị dấu `\` | Task 2.4c Mục 4 | Thấp | Đã sửa (Task 2.5a, 2.5a-fix) | Đã sửa (Task 2.5a, 2.5a-fix) |
@@ -45,7 +45,7 @@
 - *(Như cũ)*
 
 ### TD-02: Chuẩn hóa cơ chế bắt sự kiện IME trong `SmartKeysExtension`
-- *(Như cũ)*
+- **Cập nhật Task 2.6c:** Đã tích hợp `PasteSanitizerExtension` ngăn chặn can thiệp input rules / shortcuts khi `view.composing === true`. `SmartKeysExtension` duy trì an toàn và chuỗi sự kiện composition lifecycle (`compositionstart`, `compositionupdate`, `compositionend`) bảo toàn nguyên vẹn mã hóa Unicode NFC/NFD, được kiểm thử tự động tại `tests/unit/editor/task26c.test.ts`.
 
 ### TD-03: Khoảng trắng 1–3 hoặc tab đầu dòng trước ký hiệu mở lại thành block
 - **Chuỗi/JSON tái hiện:**
