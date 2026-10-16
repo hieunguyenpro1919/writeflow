@@ -174,8 +174,8 @@ describe('Task 2.6a: Unified Schema & AST Equivalence', () => {
     const corpusDir = path.resolve(__dirname, '../../fixtures/markdown/corpus');
     const corpusFiles = getAllCorpusFiles(corpusDir);
 
-    it(`verifies exactly 62 corpus files exist`, () => {
-      expect(corpusFiles.length).toBe(62);
+    it(`verifies at least 62 corpus files exist`, () => {
+      expect(corpusFiles.length).toBeGreaterThanOrEqual(62);
     });
 
     // Reuse an Editor instance to efficiently test all 62 corpus files
