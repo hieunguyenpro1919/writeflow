@@ -81,23 +81,25 @@ test.describe('Task 2.6d: E2E Vietnamese IME Composition & CDP Testing', () => {
       selectionEnd: 2,
     });
 
-    // Assert h1 is NOT created during composition
+    // Confirm composition text '# ' is actually inserted into DOM before checking rule suppression
+    await expect(editor).toContainText('#');
+
+    // Assert h1 is NOT created during composition (remains paragraph)
     await expect(editor.locator('h1')).toHaveCount(0);
     await expect(editor.locator('p')).toHaveCount(1);
 
     // Cancel composition
     await client.send('Input.imeSetComposition', { text: '', selectionStart: 0, selectionEnd: 0 });
 
-    // 2.2. Compose '*' and '*chữ*' inside editor
-    await client.send('Input.imeSetComposition', { text: '*', selectionStart: 1, selectionEnd: 1 });
-    await expect(editor.locator('em')).toHaveCount(0);
-    await expect(editor.locator('i')).toHaveCount(0);
-
+    // 2.2. Compose '*chữ*' inside editor
     await client.send('Input.imeSetComposition', {
       text: '*chữ*',
       selectionStart: 5,
       selectionEnd: 5,
     });
+
+    // Confirm composition text '*chữ*' is actually inserted into DOM before checking rule suppression
+    await expect(editor).toContainText('*chữ*');
 
     // Assert em / italic mark is NOT created during composition
     await expect(editor.locator('em')).toHaveCount(0);
