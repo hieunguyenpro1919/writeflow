@@ -11,10 +11,11 @@ Mục tiêu: Đánh giá tính toàn vẹn và phát hiện mọi trường hợ
 
 - `tests/fixtures/markdown/corpus/oss/`: **22 file upstream OSS thật nguyên bản**, tải trực tiếp từ upstream GitHub ngày 10/10/2026, khóa toàn vẹn bằng SHA-256.
 - `tests/fixtures/markdown/corpus/real/`: **9 file tài liệu thật nội bộ** lấy trực tiếp từ dự án WriteFlow.
+- `tests/fixtures/markdown/corpus/real/myMD/`: **4 file tài liệu thật tiếng Việt (hồ sơ nhân vật)** do PO cung cấp trực tiếp ngày 16/10/2026, khóa toàn vẹn bằng SHA-256.
 - `tests/fixtures/markdown/corpus/synthetic/`: **31 file tự soạn hợp lệ** (30 file mẫu tổng hợp & ca biên kỹ thuật + 1 ca biên hiệu năng cực hạn 124 KB).
 - `SOURCES.md`: Hồ sơ nguồn gốc, giấy phép, URL upstream và bảng mã băm SHA-256.
 
-Tổng cộng: **62 file** (trong đó **31 file tài liệu thật**: 22 file upstream OSS + 9 file dự án nội bộ).
+Tổng cộng: **66 file** (trong đó **35 file tài liệu thật**: 22 file upstream OSS + 9 file dự án nội bộ + 4 file tiếng Việt do PO cung cấp trực tiếp).
 
 ---
 
@@ -67,6 +68,19 @@ Các file tài liệu thật được trích xuất trực tiếp từ mã ngu�
 
 ---
 
+## 3b. Bảng 4 file tiếng Việt thật từ PO (`tests/fixtures/markdown/corpus/real/myMD/`)
+
+Toàn bộ 4 file dưới đây là tài liệu thật tiếng Việt (hồ sơ nhân vật) do Product Owner (PO) cung cấp trực tiếp ngày 16/10/2026. Các file được giữ nguyên bản từng byte, không chỉnh sửa và được bảo vệ bằng kiểm tra mã băm SHA-256 (khóa 16 ký tự đầu và mã băm toàn phần):
+
+| STT | Tên file | Nguồn gốc | Ngày tiếp nhận | Kích thước | 16 ký tự đầu SHA-256 | Mã băm SHA-256 toàn phần |
+| :---: | :--- | :--- | :---: | :---: | :---: | :--- |
+| 01 | `NWOF_LUU_HOANG_CHARACTER_PROFILE.md` | PO cung cấp trực tiếp | 16/10/2026 | 2,047 B | `5a437272c7560a66` | `5a437272c7560a66bbe8369207c4c74cb767c15338bda8249dbacf3d5bb01815` |
+| 02 | `NWOF_NGO_HAN_LONG_CHARACTER_PROFILE.md` | PO cung cấp trực tiếp | 16/10/2026 | 1,837 B | `5761b6292a1604ff` | `5761b6292a1604ffa226b464d1dc8e973ad5e855c54ff21ede0b33b20af260a0` |
+| 03 | `NWOF_THUAN_VO_DICH_CHARACTER_PROFILE.md` | PO cung cấp trực tiếp | 16/10/2026 | 2,453 B | `c8d45cd0a67dc655` | `c8d45cd0a67dc6556178f75823dfcae09cf523c7641b77748daa600cbd661121` |
+| 04 | `NWOF_VO_HU_DONG_CHARACTER_PROFILE.md` | PO cung cấp trực tiếp | 16/10/2026 | 2,095 B | `26855a98ade2d7e7` | `26855a98ade2d7e7b48aadb42c5269c9df982a16b164cb88764e0f0924fa266a` |
+
+---
+
 ## 4. Bảng 31 file tự soạn hợp lệ (`tests/fixtures/markdown/corpus/synthetic/`)
 
 Các file do WriteFlow Team tự soạn phục vụ kiểm thử đơn vị, kiểm tra bao phủ cú pháp và kiểm thử biên:
@@ -107,10 +121,11 @@ Các file do WriteFlow Team tự soạn phục vụ kiểm thử đơn vị, ki�
 
 ---
 
-## 5. Tài liệu người dùng thực tế từ PO (Chờ PO bàn giao)
+## 5. Tài liệu người dùng thực tế từ PO
 
-Mục này ghi nhận danh sách tài liệu người dùng thực tế từ Product Owner (PO) sẽ được nạp bổ sung vào corpus ngay khi PO bàn giao:
+Mục này ghi nhận danh sách tài liệu người dùng thực tế từ Product Owner (PO):
 
+- `[Đã bàn giao 16/10/2026]` 4 file hồ sơ nhân vật tiếng Việt tại `tests/fixtures/markdown/corpus/real/myMD/` (đã tích hợp vào corpus và khóa SHA-256).
 - `[Chờ PO]` Tài liệu ghi chép cá nhân của PO (Obsidian / Notion export dạng Markdown).
 - `[Chờ PO]` File biên bản cuộc họp & roadmap kinh doanh của WriteFlow.
 - `[Chờ PO]` Bản thảo bài viết blog công nghệ kèm ảnh minh họa và công thức tài chính.

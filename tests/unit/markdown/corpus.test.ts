@@ -39,6 +39,18 @@ export const EXPECTED_OSS_SHA256: Record<string, string> = {
   'oss/lodash-readme.md': '882ff84de79568af63234100cfc6497f091195c358cb27b91dc2c4b27692be03',
 };
 
+/**
+ * Expected SHA-256 Checksums for 4 Authentic Vietnamese Documents (PO myMD).
+ * Delivered directly by PO on 16/10/2026.
+ * Rule: Bit-for-bit immutable; first 16 chars locked.
+ */
+export const EXPECTED_MYMD_SHA256: Record<string, string> = {
+  'real/myMD/NWOF_LUU_HOANG_CHARACTER_PROFILE.md': '5a437272c7560a66bbe8369207c4c74cb767c15338bda8249dbacf3d5bb01815',
+  'real/myMD/NWOF_NGO_HAN_LONG_CHARACTER_PROFILE.md': '5761b6292a1604ffa226b464d1dc8e973ad5e855c54ff21ede0b33b20af260a0',
+  'real/myMD/NWOF_THUAN_VO_DICH_CHARACTER_PROFILE.md': 'c8d45cd0a67dc6556178f75823dfcae09cf523c7641b77748daa600cbd661121',
+  'real/myMD/NWOF_VO_HU_DONG_CHARACTER_PROFILE.md': '26855a98ade2d7e7b48aadb42c5269c9df982a16b164cb88764e0f0924fa266a',
+};
+
 export type DefectCode = 'B2' | 'B6' | 'B1b' | 'B8' | 'N1' | 'TD-10' | 'TD-11' | 'TD-12' | 'TD-13';
 
 export interface KnownFailureInfo {
@@ -88,6 +100,19 @@ describe('Corpus Round-trip Evaluation (Task 2.5b-fix2)', () => {
         const buffer = fs.readFileSync(filePath);
         const actualHash = crypto.createHash('sha256').update(buffer).digest('hex');
         expect(actualHash).toBe(expectedHash);
+      });
+    }
+  });
+
+  describe('Integrity Lock: SHA-256 for 4 Authentic Vietnamese Documents (PO myMD)', () => {
+    for (const [file, expectedHash] of Object.entries(EXPECTED_MYMD_SHA256)) {
+      it(`verifies SHA-256 integrity and 16-char prefix of ${file}`, () => {
+        const filePath = path.join(corpusDir, file);
+        expect(fs.existsSync(filePath)).toBe(true);
+        const buffer = fs.readFileSync(filePath);
+        const actualHash = crypto.createHash('sha256').update(buffer).digest('hex');
+        expect(actualHash).toBe(expectedHash);
+        expect(actualHash.substring(0, 16)).toBe(expectedHash.substring(0, 16));
       });
     }
   });

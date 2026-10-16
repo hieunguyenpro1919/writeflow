@@ -62,6 +62,11 @@ Tài liệu này ghi nhận và phê duyệt các biến đổi cú pháp đư�
 - **Phân cách giữa các định nghĩa tham chiếu liên tiếp (Task 2.5d Bước 0)**:
   - Khi hai khối định nghĩa tham chiếu (`reference_def`) đứng liền kề nhau ở cấp gốc (root document), chúng được ngăn cách bằng 1 ký tự xuống dòng `\n` thay vì 2 ký tự xuống dòng `\n\n`.
   - Giúp bảo toàn phong cách trình bày liên tiếp của các khối tham chiếu (ví dụ `express-readme.md`) tại điểm ghép khối AST mà không làm ảnh hưởng dòng trống trong các khối khác (code block, raw HTML, list).
+- **Chuẩn hóa thẻ liên kết & hình ảnh HTML mở rộng (Task 2.8 - TD-12)**:
+  - Thuộc tính tùy biến của thẻ `<a>` / `<img>` (ngoài href, title, src, alt) có thể bị loại bỏ khi chuẩn hóa thành link/ảnh Markdown thông thường.
+  - Ví dụ: `<a href="https://example.com/docs" target="_blank" rel="noopener" class="btn">Docs</a>` chuẩn hóa thành `[Docs](https://example.com/docs)`.
+  - Ví dụ: `<img src="photo.jpg" alt="Cover" width="300" height="200" loading="lazy" />` chuẩn hóa thành `![Cover](photo.jpg)`.
+  - Lý do: Chuẩn hóa cú pháp theo định dạng Markdown canonical; bảo toàn trọn vẹn URL đích và nhãn văn bản/alt text, chấp nhận lược bỏ các thuộc tính mở rộng không thuộc đặc tả cú pháp CommonMark/GFM link chuẩn.
 
 ## 5. Khối mã (Code Blocks) & Khối trích dẫn (Blockquotes)
 - **Fenced Code Blocks**:

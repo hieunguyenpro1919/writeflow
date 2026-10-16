@@ -394,7 +394,7 @@ if (import.meta.url.endsWith(process.argv[1]?.replace(/\\/g, '/')) || process.ar
 
   const categories = [
     { key: 'oss' as const, title: 'PHẦN A: 22 FILE TÀI LIỆU UPSTREAM OSS NGUYÊN BẢN' },
-    { key: 'real' as const, title: 'PHẦN B: 9 FILE TÀI LIỆU THẬT NỘI BỘ REPO WRITEFLOW' },
+    { key: 'real' as const, title: 'PHẦN B: 13 FILE TÀI LIỆU THẬT NỘI BỘ & TIẾNG VIỆT MYMD (9 REPO + 4 PO)' },
     { key: 'synthetic' as const, title: 'PHẦN C: 31 FILE TỰ SOẠN & CA BIÊN KỸ THUẬT' },
   ];
 
