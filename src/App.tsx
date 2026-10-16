@@ -5,12 +5,15 @@ import { TiptapEditor } from './components/editor/TiptapEditor';
 import { ToastHost } from './components/ui/ToastHost';
 import { StatusBar } from './components/status/StatusBar';
 import { ShortcutsDialog } from './components/shortcuts/ShortcutsDialog';
+import { isDevMode } from './components/dev/is-dev-mode';
+import { DevPanel } from './components/dev/DevPanel';
 import './styles/globals.css';
 import './styles/editor.css';
 
 export function App() {
   const { t } = useTranslation();
   const editor = useAppEditor();
+  const isDev = isDevMode();
 
   return (
     <div className="editor-container">
@@ -42,6 +45,7 @@ export function App() {
       <StatusBar editor={editor} />
       <ToastHost />
       <ShortcutsDialog editor={editor} />
+      {isDev && <DevPanel editor={editor} />}
     </div>
   );
 }

@@ -1,0 +1,702 @@
+import StarterKit from '@tiptap/starter-kit';
+import { Document } from '@tiptap/extension-document';
+import Link from '@tiptap/extension-link';
+import CodeBlock from '@tiptap/extension-code-block';
+import Image from '@tiptap/extension-image';
+import Paragraph from '@tiptap/extension-paragraph';
+import HardBreak from '@tiptap/extension-hard-break';
+import { TaskList } from '@tiptap/extension-task-list';
+import { TaskItem } from '@tiptap/extension-task-item';
+import { Node, type AnyExtension } from '@tiptap/core';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Blockquote from '@tiptap/extension-blockquote';
+import OrderedList from '@tiptap/extension-ordered-list';
+import Heading from '@tiptap/extension-heading';
+import { Lexer } from 'marked';
+import { TIPTAP_BLOCKQUOTE_DEFAULT_KEY, TIPTAP_HARDBREAK_DEFAULT_KEY } from '../keymap/shortcuts';
+
+/**
+ * Link URL validation adhering to CommonMark/Phase 1 rules:
+ * accepts only http, https, mailto, and relative paths (e.g. /, ./, ../, #, ?).
+ */
+export function isValidLinkHref(url: string): boolean {
+  if (!url) return false;
+  const cleaned = Array.from(url)
+    .filter((c) => c.charCodeAt(0) > 32)
+    .join('')
+    .toLowerCase();
+  if (
+    cleaned.startsWith('javascript:') ||
+    cleaned.startsWith('data:') ||
+    cleaned.startsWith('vbscript:')
+  ) {
+    return false;
+  }
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (/^(\/|\.\.?\/|#|\?)/.test(trimmed)) return true;
+  const schemeMatch = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(cleaned);
+  if (schemeMatch) {
+    const proto = schemeMatch[1].toLowerCase();
+    return proto === 'http' || proto === 'https' || proto === 'mailto';
+  }
+  return true;
+}
+
+// Prevent marked's anyPunctuation from destroying closing backticks in code spans containing backslashes (B5, B5b).
+const basePunct = /\\([\p{P}\p{S}])/gu;
+export const safePunctuation = Object.assign(new RegExp(basePunct.source, basePunct.flags), {
+  exec(this: RegExp, str: string) {
+    basePunct.lastIndex = this.lastIndex;
+    while (true) {
+      const match = basePunct.exec(str);
+      if (!match) {
+        this.lastIndex = basePunct.lastIndex;
+        return null;
+      }
+      if (match[1] === '`') {
+        const lineBefore = str.slice(str.lastIndexOf('\n', match.index) + 1, match.index);
+        let openLen = 0;
+        let i = 0;
+        while (i < lineBefore.length) {
+          if (lineBefore[i] === '`') {
+            let len = 0;
+            while (i < lineBefore.length && lineBefore[i] === '`') {
+              len++;
+              i++;
+            }
+            if (openLen === 0) openLen = len;
+            else if (openLen === len) openLen = 0;
+          } else {
+            i++;
+          }
+        }
+        if (openLen > 0) continue;
+      }
+      this.lastIndex = basePunct.lastIndex;
+      return match;
+    }
+  },
+});
+
+const inlineRules = (
+  Lexer as unknown as { rules?: { inline?: Record<string, { anyPunctuation?: RegExp }> } }
+).rules?.inline;
+if (!inlineRules || !inlineRules.gfm) {
+  throw new Error('Marked internal structure changed: Lexer.rules.inline not found');
+}
+['gfm', 'breaks', 'normal', 'pedantic'].forEach((k) => {
+  if (inlineRules[k]) inlineRules[k].anyPunctuation = safePunctuation;
+});
+
+// Fix off-by-one indentation in OrderedList markdown tokenizer for nested code blocks (B10).
+const mdTokenizer = OrderedList.config.markdownTokenizer;
+const origOLTokenize = mdTokenizer?.tokenize;
+if (mdTokenizer && origOLTokenize) {
+  mdTokenizer.tokenize = function (...args: Parameters<typeof origOLTokenize>) {
+    const res = origOLTokenize.apply(this, args) as
+      { items?: { tokens?: { type: string; raw?: string; text?: string }[] }[] } | undefined;
+    if (res && Array.isArray(res.items)) {
+      for (const item of res.items) {
+        if (Array.isArray(item.tokens)) {
+          for (const tok of item.tokens) {
+            if (tok.type === 'code') {
+              const closeMatch = tok.raw?.match(/\n( +)(?:`{3,}|~{3,})\s*$/);
+              const openMatch = tok.raw?.match(/^( *)(?:`{3,}|~{3,})/);
+              const excess =
+                (closeMatch ? closeMatch[1].length : 0) - (openMatch ? openMatch[1].length : 0);
+              if (excess > 0 && tok.text) {
+                tok.text = tok.text.replace(new RegExp(`^ {1,${excess}}`, 'gm'), '');
+                tok.raw = tok.raw?.replace(new RegExp(`^ {1,${excess}}`, 'gm'), '');
+              }
+            }
+          }
+        }
+      }
+    }
+    return res as ReturnType<typeof origOLTokenize>;
+  };
+}
+import {
+  RawBlockExtension,
+  RawTableExtension,
+  RawDefExtension,
+  RawMathExtension,
+  RawInlineExtension,
+} from '../editor/extensions/raw-block';
+
+/**
+ * Escapes characters at the start of a paragraph or internal hard-break lines
+ * to prevent plain text from mutating into markdown block structures on re-parsing (Plan 9.5 P0).
+ */
+export function escapeParagraphLineStarts(content: string): string {
+  const lines = content.split('\n');
+  const escapedLines = lines.map((line) => {
+    // 1. Heading # or ## etc. followed by space or end of line (Task 2.4c Group D)
+    let l = line.replace(/^(#{1,6})(\s+|$)/, '\\$1$2');
+    // 2. Ordered list: 1. or 1986. or 1) followed by space or end of line (Task 2.4c Group D)
+    l = l.replace(/^([0-9]+)([.)])(\s+|$)/, '$1\\$2$3');
+    // 3. Task list: - [ ] or - [x]
+    l = l.replace(/^([-+*])\s+\[([ xX])\](\s+)/, '\\$1 \\[$2\\]$3');
+    // 4. Bullet list: - or + or * followed by space or end of line (Task 2.4c Group D)
+    l = l.replace(/^([-+*])(\s+|$)/, '\\$1$2');
+    // 5. Horizontal rule: --- or *** or ___
+    l = l.replace(/^([-*_]{3,})(\s*)$/, '\\$1$2');
+    // 6. Blockquote: >
+    l = l.replace(/^(>\s*)/, '\\$1');
+    // 7. Indented code: 4 spaces at line start
+    l = l.replace(/^ {4}/, '&#32;   ');
+    // 8. Fenced code: ``` or ~~~
+    l = l.replace(/^(`{3,}|~{3,})/, '\\$1');
+    // 9. Plain text reference definition line: [ref]: http (Task 2.4c Group D)
+    l = l.replace(/^(\[[^\]]+\]:)/, '\\$1');
+    // 10. Plain text tags &lt;tag&gt; or <tag> -> \<tag>
+    l = l.replace(/^&lt;(\/?(?:[a-zA-Z][\w-]*))/, '\\<$1');
+    return l;
+  });
+  return escapedLines.join('\n');
+}
+
+/**
+ * Unescapes special characters (_, *, ~, &) in bare URLs (http://, https://, www.)
+ * within plain text portions of a paragraph (TD-05).
+ * Protects inline code spans `...`, HTML comments <!--...-->, HTML tags <...>,
+ * and markdown links [...](...) so they remain completely unaltered byte-for-byte.
+ */
+export function unescapeBareUrlsInParagraph(content: string): string {
+  return content.replace(
+    /(`+[\s\S]*?`+|<!--[\s\S]*?-->|<[^>]+>|\[[^\]]*\]\([^)]*\))|((?:https?:\/\/|www\.)[^\s<>]+)/g,
+    (_match, protectedToken, bareUrl) => {
+      if (protectedToken) {
+        return protectedToken;
+      }
+      return bareUrl.replace(/\\([_*~])/g, '$1').replace(/&amp;/g, '&');
+    },
+  );
+}
+
+/**
+ * Restores named/numeric entities, footnote references, and reference definitions
+ * strictly within plain text nodes, leaving code spans, comments, tags, and links untouched.
+ */
+export function restorePlainTextMarkdown(content: string): string {
+  return content
+    .split(/(`+[\s\S]*?`+|<!--[\s\S]*?-->|<[^>]+>|\[[^\]]*\]\([^)]*\))/g)
+    .map((chunk, i) => {
+      if (i % 2 === 1) return chunk;
+      let text = chunk;
+      // N1: Minimal escaping for &, >, < while protecting tag-like constructs
+      const tagPattern =
+        /(&lt;(?:\/?[a-zA-Z][\w-]*(?:\s+[^&<>]*)?\/?|!--[\s\S]*?--|[!?][\s\S]*?|[a-zA-Z][a-zA-Z0-9+.-]*:[^\s&<>]+|[^\s&<>]+@[^\s&<>]+)&gt;)/g;
+      text = text
+        .split(tagPattern)
+        .map((sub, j) => {
+          if (j % 2 === 1) return sub;
+          let s = sub;
+          s = s.replace(/&amp;(?!(?:#[0-9]+|#[xX][0-9a-fA-F]+|[a-zA-Z0-9]+);)/g, '&');
+          s = s.replace(/((?:^|\n) {0,3}&gt;)|&gt;/g, (_m, lineStart) => lineStart ?? '>');
+          s = s.replace(/&lt;/g, '<');
+          return s;
+        })
+        .join('');
+      text = text.replace(/&amp;(?!(?:amp|lt|gt|quot|apos);)([a-zA-Z0-9#]+;)/g, '&$1');
+      text = text.replace(/\\\[\^([^\s\]]+)\\\]/g, '[^$1]');
+      text = text.replace(/(^|\n)\\\[([^\]]+)\\\]:/g, '$1\\[$2]:');
+      return text;
+    })
+    .join('');
+}
+
+/**
+ * Custom Paragraph extension that avoids infinite recursion on empty content (Task 2.4c Group A),
+ * trims trailing hardBreaks at block boundaries (Task 2.4c Group B),
+ * restores unescaped characters in bare URLs (Task 2.5a TD-05),
+ * and automatically escapes syntax at line starts (Plan 9.5 P0).
+ */
+export const CustomParagraph = Paragraph.extend({
+  renderMarkdown(node, h, ctx) {
+    if (!node) {
+      return '';
+    }
+
+    const content = Array.isArray(node.content) ? node.content : [];
+
+    const cleaned: typeof content = [];
+    for (let i = 0; i < content.length; i++) {
+      const child = content[i];
+      if (child.type === 'text') {
+        const prev = cleaned[cleaned.length - 1];
+        let text = child.text || '';
+        if (prev?.type === 'hardBreak') text = text.replace(/^\n+/, '');
+        if (text) cleaned.push({ ...child, text });
+      } else {
+        cleaned.push(child);
+      }
+    }
+    while (cleaned.length > 0) {
+      const last = cleaned[cleaned.length - 1];
+      if (last.type === 'hardBreak' || (last.type === 'text' && !last.text?.trim())) cleaned.pop();
+      else break;
+    }
+
+    if (cleaned.length === 0) {
+      // Emit &nbsp; for consecutive empty paragraphs to preserve blank lines
+      const prevContent = Array.isArray(ctx?.previousNode?.content) ? ctx.previousNode.content : [];
+      const prevIsEmpty = ctx?.previousNode?.type === 'paragraph' && prevContent.length === 0;
+      return prevIsEmpty ? '&nbsp;' : '';
+    }
+
+    const raw = h.renderChildren(cleaned);
+    return escapeParagraphLineStarts(unescapeBareUrlsInParagraph(restorePlainTextMarkdown(raw)));
+  },
+});
+
+/**
+ * Custom Heading extension that normalizes entities and footnote references in heading text.
+ */
+export const CustomHeading = Heading.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+
+  renderMarkdown(node, h) {
+    const level = node.attrs?.level ? parseInt(node.attrs.level as string, 10) : 1;
+    const prefix = '#'.repeat(level);
+    if (!node.content) return '';
+    const raw = h.renderChildren(node.content);
+    return `${prefix} ${restorePlainTextMarkdown(raw)}`;
+  },
+});
+
+/**
+ * Custom HardBreak extension that outputs hard breaks with trailing backslash (Plan 9.3).
+ */
+export const CustomHardBreak = HardBreak.extend({
+  addKeyboardShortcuts() {
+    const parent = this.parent ? this.parent() : {};
+    const kept = { ...parent };
+    delete kept[TIPTAP_HARDBREAK_DEFAULT_KEY];
+    return kept;
+  },
+
+  renderMarkdown(_node, _h, ctx) {
+    return ctx?.parentType === 'heading' ? '<br>' : '\\\n';
+  },
+});
+
+/**
+ * Custom HorizontalRule extension that ensures a blank line between paragraph and hr
+ * in list containers to prevent CommonMark Setext heading collision (Task 2.4c Group C).
+ */
+export const CustomHorizontalRule = HorizontalRule.extend({
+  addInputRules() {
+    return [];
+  },
+
+  renderMarkdown(_node, _h, ctx) {
+    if (ctx?.previousNode?.type === 'paragraph' && ctx?.parentType === 'listItem') {
+      return '\n---';
+    }
+    return '---';
+  },
+});
+
+/**
+ * Custom Blockquote that serializes blockquotes with only empty paragraphs to empty string (TD-07).
+ */
+export const CustomBlockquote = Blockquote.extend({
+  addKeyboardShortcuts() {
+    const parent = this.parent ? this.parent() : {};
+    const kept = { ...parent };
+    delete kept[TIPTAP_BLOCKQUOTE_DEFAULT_KEY];
+    return kept;
+  },
+
+  renderMarkdown(node, h, ctx) {
+    if (!node.content || !Array.isArray(node.content) || node.content.length === 0) {
+      return '';
+    }
+    const hasMeaningfulContent = node.content.some((child) => {
+      if (child.type === 'paragraph') {
+        const c = Array.isArray(child.content) ? child.content : [];
+        return c.length > 0;
+      }
+      return true;
+    });
+    if (!hasMeaningfulContent) {
+      return '';
+    }
+    const rendered = this.parent?.(node, h, ctx) ?? '';
+    let result = rendered.replace(
+      /^>\s*\\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\\]/im,
+      '> [!$1]',
+    );
+    result = result.replace(
+      /(^>\s*\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\])\n>\n(>\s*(?:[-*+]|\d+\.|`{3}))/im,
+      '$1\n$2',
+    );
+    return result;
+  },
+});
+
+/**
+ * Custom CodeBlock that calculates backtick length dynamically (Plan 9.3).
+ * If code content contains 3 backticks, it uses 4 backticks (````), etc.
+ */
+export const CustomCodeBlock = CodeBlock.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+
+  addInputRules() {
+    return [];
+  },
+
+  parseMarkdown(token, helpers) {
+    const raw = (token.raw ?? '').trimStart();
+    if (!raw.startsWith('```') && !raw.startsWith('~~~') && token.codeBlockStyle !== 'indented') {
+      return [];
+    }
+
+    let text = token.text || '';
+    const closeMatch = token.raw?.match(/\n( +)(?:`{3,}|~{3,})\s*$/);
+    const openMatch = token.raw?.match(/^( *)(?:`{3,}|~{3,})/);
+    const excessIndent =
+      (closeMatch ? closeMatch[1].length : 0) - (openMatch ? openMatch[1].length : 0);
+    if (excessIndent > 0 && text) {
+      text = text.replace(new RegExp(`^ {1,${excessIndent}}`, 'gm'), '');
+    }
+
+    return helpers.createNode(
+      'codeBlock',
+      { language: token.lang || null },
+      text ? [helpers.createTextNode(text)] : [],
+    );
+  },
+
+  renderMarkdown(node, h) {
+    const language = node.attrs?.language || '';
+    const content = node.content ? h.renderChildren(node.content) : '';
+
+    const match = content.match(/`{3,}/g);
+    let maxBackticks = 2;
+    if (match) {
+      for (const m of match) {
+        if (m.length > maxBackticks) {
+          maxBackticks = m.length;
+        }
+      }
+    }
+    const fenceLength = Math.max(3, maxBackticks + 1);
+    const fence = '`'.repeat(fenceLength);
+
+    return `${fence}${language}\n${content}\n${fence}`;
+  },
+});
+
+/**
+ * Custom Link that wraps URLs with spaces in angle brackets <path with space>
+ * and preserves extended HTML attributes (target, rel, class, style, id) as raw HTML <a> tags.
+ */
+export const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      target: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('target'),
+      },
+      rel: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('rel'),
+      },
+      class: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('class'),
+      },
+      style: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('style'),
+      },
+      id: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('id'),
+      },
+    };
+  },
+
+  renderMarkdown(node, h) {
+    const rawHref = node.attrs?.href ?? '';
+    const title = node.attrs?.title ?? '';
+    const target = node.attrs?.target;
+    const rel = node.attrs?.rel;
+    const className = node.attrs?.class;
+    const style = node.attrs?.style;
+    const id = node.attrs?.id;
+    const text = h.renderChildren(node);
+
+    // If extended attributes are present, output verbatim raw HTML <a> tag
+    if (target || rel || className || style || id) {
+      const safeHref = rawHref.replace(/&/g, '&amp;');
+      const parts = [`href="${safeHref}"`];
+      if (target) parts.push(`target="${target}"`);
+      if (rel) parts.push(`rel="${rel}"`);
+      if (title) parts.push(`title="${title}"`);
+      if (className) parts.push(`class="${className}"`);
+      if (style) parts.push(`style="${style}"`);
+      if (id) parts.push(`id="${id}"`);
+      return `<a ${parts.join(' ')}>${text}</a>`;
+    }
+
+    const formattedHref =
+      rawHref.includes(' ') && !rawHref.startsWith('<') && !rawHref.endsWith('>')
+        ? `<${rawHref}>`
+        : rawHref;
+
+    return title ? `[${text}](${formattedHref} "${title}")` : `[${text}](${formattedHref})`;
+  },
+});
+
+/**
+ * Custom Image that preserves alt, src, title attributes,
+ * and preserves extended attributes (width, height, style, class, id) as raw HTML <img> tags.
+ */
+export const CustomImage = Image.extend({
+  markdownTokenName: 'image',
+
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: (el) => {
+          const s = el.getAttribute('src');
+          return s && !/^(javascript|data|vbscript):/i.test(s.trim()) ? s : null;
+        },
+      },
+      width: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('width'),
+      },
+      height: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('height'),
+      },
+      style: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('style'),
+      },
+      class: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('class'),
+      },
+      id: {
+        default: null,
+        parseHTML: (el) => el.getAttribute('id'),
+      },
+    };
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const s = String(HTMLAttributes.src || '').trim();
+    return [
+      'img',
+      /^(javascript|data|vbscript):/i.test(s) ? { ...HTMLAttributes, src: '' } : HTMLAttributes,
+    ];
+  },
+
+  parseMarkdown(token) {
+    const t = token as { href?: string; text?: string; title?: string };
+    return {
+      type: this.name,
+      attrs: {
+        src: t.href || '',
+        alt: t.text || '',
+        title: t.title || null,
+      },
+    };
+  },
+
+  renderMarkdown(node) {
+    const src = node.attrs?.src ?? '';
+    const alt = node.attrs?.alt ?? '';
+    const title = node.attrs?.title;
+    const width = node.attrs?.width;
+    const height = node.attrs?.height;
+    const style = node.attrs?.style;
+    const className = node.attrs?.class;
+    const id = node.attrs?.id;
+
+    // If extended attributes are present, output verbatim raw HTML <img> tag
+    if (width || height || style || className || id) {
+      const parts = [`src="${src}"`];
+      if (alt) parts.push(`alt="${alt}"`);
+      if (title) parts.push(`title="${title}"`);
+      if (width) parts.push(`width="${width}"`);
+      if (height) parts.push(`height="${height}"`);
+      if (style) parts.push(`style="${style}"`);
+      if (className) parts.push(`class="${className}"`);
+      if (id) parts.push(`id="${id}"`);
+      return `<img ${parts.join(' ')} />`;
+    }
+
+    return title ? `![${alt}](${src} "${title}")` : `![${alt}](${src})`;
+  },
+});
+
+/**
+ * RawInlineNode preserves link-wrapped images [![badge](img)](url) (B2)
+ * and HTML <a href><img ...></a> (B6) verbatim without dropping links or mangling attributes.
+ */
+export const RawInlineNode = Node.create({
+  name: 'rawInlineNode',
+  group: 'inline',
+  inline: true,
+  atom: true,
+  addAttributes: () => ({ content: { default: '' } }),
+  parseHTML: () => [
+    {
+      tag: 'span[data-raw-inline-node]',
+      getAttrs: (el) => ({
+        content:
+          (el as HTMLElement).getAttribute('data-raw-content') ||
+          (el as HTMLElement).textContent ||
+          '',
+      }),
+    },
+  ],
+  renderHTML: ({ node }) => [
+    'span',
+    { 'data-raw-inline-node': '', 'data-raw-content': node.attrs.content },
+    node.attrs.content,
+  ],
+  markdownTokenizer: {
+    name: 'rawInlineNode',
+    level: 'inline',
+    start(src: string): number {
+      const i1 = src.indexOf('[');
+      const i2 = src.indexOf('<a');
+      return i1 === -1 ? i2 : i2 === -1 ? i1 : Math.min(i1, i2);
+    },
+    tokenize(src: string) {
+      const b2 =
+        /^\[((?:[^[\]]|!\[[^\]]*\](?:\([^)]+\)|\[[^\]]*\]))+)\](?:\(([^)]+)\)|\[([^\]]*)\])/.exec(
+          src,
+        );
+      if (b2 && b2[1].includes('![')) return { type: 'rawInlineNode', raw: b2[0], text: b2[0] };
+      const b6 = /^<a\s+[^>]*href=[^>]*>[\s\S]*?<img[\s\S]*?<\/a>/i.exec(src);
+      return b6 ? { type: 'rawInlineNode', raw: b6[0], text: b6[0] } : undefined;
+    },
+  },
+  markdownTokenName: 'rawInlineNode',
+  parseMarkdown: (token) => ({
+    type: 'rawInlineNode',
+    attrs: { content: (token.raw ?? token.text ?? '').toString() },
+  }),
+  renderMarkdown: (node) => node.attrs?.content || '',
+});
+
+/**
+ * Creates the official extensions for WriteFlow Markdown Engine (Phase 2).
+ * Supports standard GFM and CommonMark block & inline structures:
+ * - Nested bullet and ordered lists
+ * - Task lists & task items ([ ] and [x])
+ * - Nested blockquotes (> and > >)
+ * - Fenced code blocks with language and dynamic backtick fences
+ * - Horizontal rules (---)
+ * - Headings H1-H6
+ * - CustomParagraph with line-start syntax escaping (Plan 9.5 P0)
+ * - CustomHardBreak with backslash newline (Plan 9.3)
+ * - Inline marks: Bold (**), Italic (*), Strike (~~), Inline Code (`), Links ([text](url))
+ * - Images with alt, src, title (![alt](url "title"))
+ * - Extended attribute preservation for <a> and <img>
+ * - Raw HTML, Tables, Footnotes, Reference definitions, Math blocks (RawBlock & RawInline)
+ * - RawInlineNode for link-wrapped badges (B2) and HTML <a><img></a> (B6)
+ */
+/** Custom Document separates adjacent root reference definitions by \n (Task 2.5d Step 0). */
+export const CustomDocument = Document.extend({
+  renderMarkdown(node, h) {
+    return (node.content || []).reduce((acc, c, i) => {
+      const p = node.content![i - 1];
+      const isRef = (n: typeof c) => n?.type === 'rawBlock' && n?.attrs?.format === 'reference_def';
+      const isEnd =
+        c?.type === 'rawBlock' &&
+        c?.attrs?.format === 'html' &&
+        (c?.attrs?.content || '').startsWith('</');
+      const sep = i > 0 ? (isRef(p) && (isRef(c) || isEnd) ? '\n' : '\n\n') : '';
+      return acc + sep + (h.renderChild?.(c, i) ?? '');
+    }, '');
+  },
+});
+
+export const CustomTaskList = TaskList.extend({
+  addKeyboardShortcuts() {
+    return {};
+  },
+});
+
+export const CustomStarterKit = StarterKit.extend({
+  addExtensions() {
+    const parentExtensions: AnyExtension[] = this.parent ? this.parent() : [];
+
+    return parentExtensions.map((ext) => {
+      // Gỡ phím tắt định dạng mặc định (Task 1.3 / Phụ lục A)
+      if (['bold', 'italic', 'strike', 'code', 'bulletList', 'orderedList'].includes(ext.name)) {
+        return ext.extend({
+          addKeyboardShortcuts() {
+            return {};
+          },
+        });
+      }
+      return ext;
+    });
+  },
+});
+
+export function createCoreSchemaExtensions(): AnyExtension[] {
+  return [
+    CustomStarterKit.configure({
+      link: false,
+      codeBlock: false,
+      underline: false,
+      horizontalRule: false,
+      strike: {},
+      heading: false,
+      trailingNode: false,
+      hardBreak: false,
+      paragraph: false,
+      blockquote: false,
+      document: false,
+    }),
+    CustomDocument,
+    CustomParagraph,
+    CustomHeading.configure({
+      levels: [1, 2, 3, 4, 5, 6],
+    }),
+    CustomHardBreak,
+    CustomHorizontalRule,
+    CustomBlockquote,
+    CustomLink.configure({
+      openOnClick: false,
+      validate: isValidLinkHref,
+      isAllowedUri: isValidLinkHref,
+    }),
+    CustomCodeBlock,
+    CustomImage.configure({
+      inline: true,
+      allowBase64: true,
+    }),
+    CustomTaskList,
+    TaskItem.configure({
+      nested: true,
+    }),
+    RawBlockExtension,
+    RawTableExtension,
+    RawDefExtension,
+    RawMathExtension,
+    RawInlineExtension,
+    RawInlineNode,
+  ];
+}
+
+export const createMarkdownEngineExtensions = createCoreSchemaExtensions;

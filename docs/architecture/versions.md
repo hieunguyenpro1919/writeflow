@@ -11,6 +11,11 @@
 | Package | Phiên bản ghim | Giấy phép | Mục đích |
 | :--- | :--- | :--- | :--- |
 | `@tiptap/core` | `3.31.4` | MIT | Engine soạn thảo văn bản cốt lõi |
+| `@tiptap/extension-image` | `3.31.4` | MIT | Extension hỗ trợ hiển thị và lưu ảnh (Image node) |
+| `@tiptap/extension-link` | `3.31.4` | MIT | Extension hỗ trợ liên kết URL (link mark) |
+| `@tiptap/extension-task-item` | `3.31.4` | MIT | Extension hỗ trợ từng mục trong danh sách công việc |
+| `@tiptap/extension-task-list` | `3.31.4` | MIT | Extension hỗ trợ danh sách công việc (Task List) |
+| `@tiptap/markdown` | `3.31.4` | MIT | Parser và Serializer Markdown tích hợp của Tiptap v3 |
 | `@tiptap/pm` | `3.31.4` | MIT | Gói ProseMirror tích hợp của Tiptap v3 |
 | `@tiptap/react` | `3.31.4` | MIT | React wrapper cho Tiptap |
 | `@tiptap/starter-kit` | `3.31.4` | MIT | Bộ extension cơ bản cho rich-text |

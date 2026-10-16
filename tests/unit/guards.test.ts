@@ -344,8 +344,8 @@ describe('Task 1.13: Guard Tests & i18n Parity', () => {
     });
   });
 
-  describe('5. Schema Guard (Task 1.13 item 5 & Plan 4.3)', () => {
-    it('ensures forbidden marks and nodes are NOT in the schema', () => {
+  describe('5. Schema Guard (Task 1.13 item 5 & Plan 4.3 / Phase 2 Sync)', () => {
+    it('ensures forbidden marks and nodes are NOT in the schema and Phase 2 schema is synced', () => {
       const editor = new Editor({
         extensions: createExtensions(),
       });
@@ -353,29 +353,32 @@ describe('Task 1.13: Guard Tests & i18n Parity', () => {
       try {
         const schema = editor.schema;
 
-        // Forbidden marks
+        // Forbidden marks (Underline strictly forbidden in CommonMark / WriteFlow)
         expect(schema.marks.underline, 'underline mark must not exist in schema').toBeUndefined();
-        expect(schema.marks.link, 'link mark must not exist in schema').toBeUndefined();
 
-        // Forbidden nodes
-        expect(schema.nodes.codeBlock, 'codeBlock node must not exist in schema').toBeUndefined();
-        expect(
-          schema.nodes.horizontalRule,
-          'horizontalRule node must not exist in schema'
-        ).toBeUndefined();
+        // Forbidden nodes (trailingNode disabled to prevent auto empty paragraphs)
+        expect(schema.nodes.trailingNode, 'trailingNode must not exist in schema').toBeUndefined();
 
-        // Allowed marks
+        // Allowed Phase 2 marks
         expect(schema.marks.bold).toBeDefined();
         expect(schema.marks.italic).toBeDefined();
         expect(schema.marks.strike).toBeDefined();
         expect(schema.marks.code).toBeDefined();
+        expect(schema.marks.link).toBeDefined();
+        expect(schema.marks.rawInline).toBeDefined();
 
-        // Allowed nodes
+        // Allowed Phase 2 synchronized nodes
         expect(schema.nodes.heading).toBeDefined();
         expect(schema.nodes.bulletList).toBeDefined();
         expect(schema.nodes.orderedList).toBeDefined();
         expect(schema.nodes.blockquote).toBeDefined();
         expect(schema.nodes.paragraph).toBeDefined();
+        expect(schema.nodes.codeBlock).toBeDefined();
+        expect(schema.nodes.horizontalRule).toBeDefined();
+        expect(schema.nodes.taskList).toBeDefined();
+        expect(schema.nodes.taskItem).toBeDefined();
+        expect(schema.nodes.image).toBeDefined();
+        expect(schema.nodes.rawBlock).toBeDefined();
       } finally {
         editor.destroy();
       }
