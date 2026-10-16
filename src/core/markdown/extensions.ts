@@ -21,10 +21,21 @@ import { TIPTAP_BLOCKQUOTE_DEFAULT_KEY, TIPTAP_HARDBREAK_DEFAULT_KEY } from '../
  */
 export function isValidLinkHref(url: string): boolean {
   if (!url) return false;
+  const cleaned = Array.from(url)
+    .filter((c) => c.charCodeAt(0) > 32)
+    .join('')
+    .toLowerCase();
+  if (
+    cleaned.startsWith('javascript:') ||
+    cleaned.startsWith('data:') ||
+    cleaned.startsWith('vbscript:')
+  ) {
+    return false;
+  }
   const trimmed = url.trim();
   if (!trimmed) return false;
   if (/^(\/|\.\.?\/|#|\?)/.test(trimmed)) return true;
-  const schemeMatch = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(trimmed);
+  const schemeMatch = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(cleaned);
   if (schemeMatch) {
     const proto = schemeMatch[1].toLowerCase();
     return proto === 'http' || proto === 'https' || proto === 'mailto';

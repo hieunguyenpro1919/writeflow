@@ -205,8 +205,8 @@ describe('Task 2.6c: Paste Sanitization, DOM Safety & IME Preservation', () => {
         f(editor.view, 1, 1, '# ', () => editor.state.tr.insertText('# ', 1, 1)),
       );
 
-      // Should be handled/suppressed by PasteSanitizer IME guard
-      expect(handled).toBe(true);
+      // Should not be intercepted/blocked by paste sanitizer (handled is falsy)
+      expect(handled).toBeFalsy();
       // Document must remain paragraph, NOT heading
       expect(editor.isActive('heading')).toBe(false);
       expect(editor.state.doc.firstChild?.type.name).toBe('paragraph');

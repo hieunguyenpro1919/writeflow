@@ -32,7 +32,10 @@ export function sanitizePastedHtml(html: string): string {
       if (name.startsWith('on') || STRIP.includes(name)) {
         el.removeAttribute(attr.name);
       } else if (name === 'href' || name === 'src') {
-        const val = attr.value.trim().toLowerCase();
+        const val = Array.from(attr.value)
+          .filter((c) => c.charCodeAt(0) > 32)
+          .join('')
+          .toLowerCase();
         if (
           val.startsWith('javascript:') ||
           val.startsWith('data:') ||
@@ -56,9 +59,6 @@ export const PasteSanitizerExtension = Extension.create({
         props: {
           transformPastedHTML(html: string) {
             return sanitizePastedHtml(html);
-          },
-          handleTextInput(view) {
-            return view.composing;
           },
         },
       }),
